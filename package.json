@@ -1,0 +1,25 @@
+{
+  "name": "wordflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "背单词 App「词流」—— Cloudflare Workers 全家桶 + React PWA monorepo",
+  "scripts": {
+    "test": "pnpm --filter @app/core test",
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "dev:web": "pnpm --filter @app/web dev",
+    "dev:server": "pnpm --filter @app/server dev",
+    "db:migrate:local": "pnpm --filter @app/server db:migrate:local",
+    "db:seed:local": "pnpm --filter @app/server db:seed:local"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd",
+      "@tailwindcss/oxide"
+    ]
+  }
+}

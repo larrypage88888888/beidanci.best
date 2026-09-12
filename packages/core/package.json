@@ -1,0 +1,21 @@
+{
+  "name": "@app/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "共享核心包：艾宾浩斯/FSRS 调度、难度轴、摸底测试、每日组单、题型工厂（web 与 server 复用同一份算法）",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

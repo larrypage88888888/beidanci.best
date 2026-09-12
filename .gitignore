@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+
+# wrangler / cloudflare local state
+.wrangler/
+.dev.vars
+
+# env & secrets
+.env
+.env.*
+
+# test coverage
+coverage/
+
+# editor & OS
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+
+# misc probe files
+.probe/

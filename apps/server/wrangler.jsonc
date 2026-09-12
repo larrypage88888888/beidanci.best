@@ -1,0 +1,48 @@
+// Wrangler 配置 —— Cloudflare Workers 全家桶（设计文档 §二）
+// 一条 `wrangler deploy` 同时发布 API 与前端 PWA 静态资产。
+{
+  "name": "wordflow-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // 定时任务：UTC 16:30 = 北京时间 00:30，为当天物化每日学习计划
+  "triggers": {
+    "crons": ["30 16 * * *"]
+  },
+
+  // 自定义域名（beidanci.best 已托管于 Cloudflare 并开启代理）
+  "routes": [
+    { "pattern": "beidanci.best", "custom_domain": true },
+    { "pattern": "www.beidanci.best", "custom_domain": true }
+  ],
+
+  // 关系数据：用户 / 记忆状态 / 复习日志
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wordflow-db",
+      "database_id": "6a19ba07-488d-4e04-ab73-cd5f5da9feb6"
+    }
+  ],
+
+  // 缓存：词库版本包、AI 结果缓存（M1）
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "4c4b9770f56a4b92879f2ab6541d479e"
+    }
+  ],
+
+  // 前端 PWA 静态资产（apps/web 构建产物）：
+  // - /api/* 一律先走 Worker（run_worker_first）
+  // - 其余路径优先命中静态文件，未命中回退 index.html（SPA 路由）
+  "assets": {
+    "directory": "../web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  }
+
+  // JWT_SECRET 用 `wrangler secret put JWT_SECRET` 注入；
+  // 本地开发用 .dev.vars（含 DEV_MODE=1 测试开关），不会随部署上传。
+}
