@@ -4,11 +4,13 @@ import {
   generateQuestion,
   hashSeed,
   kindForIndex,
+  newCombo,
+  nextCombo,
   schedule,
 } from '@app/core';
 import type { CardState, QuestionKind, QuizQuestion, Rating, ScheduleMode } from '@app/core';
 import { api } from '../lib/api';
-import type { TodayItem, TodayResponse } from '../lib/types';
+import type { CardDrawInfo, PetInfo, TodayItem, TodayResponse } from '../lib/types';
 
 /**
  * 学习会话状态机（设计文档：客户端乐观预计算 + 服务端异步确认）
@@ -55,6 +57,14 @@ interface SessionState {
   relearnAttempts: Record<string, number>;
   /** 预习词卡待展示的词（队首=当前卡）；仅当队列含新词时启用 */
   previewIds: string[];
+  /** 会话内连击（答对+1/答错归零；best 用于当日纪录与抽卡加成） */
+  combo: { count: number; best: number };
+  /** 服务端回写的词苗状态（P0 §十） */
+  pet: PetInfo | null;
+  /** 今日抽卡资格（P0 §十） */
+  cardDraw: CardDrawInfo | null;
+  /** 持有的复活卡数量 */
+  reviveCards: number;
 
   loadToday: () => Promise<void>;
   /** 完成页轮询：有新到期词则续上新一轮，返回是否恢复学习 */
@@ -112,6 +122,10 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
   inRelearnRound: false,
   relearnAttempts: {},
   previewIds: [],
+  combo: newCombo(),
+  pet: null,
+  cardDraw: null,
+  reviveCards: 0,
 
   resetError: () => set({ error: null }),
 
@@ -143,6 +157,10 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         inRelearnRound: false,
         relearnAttempts: {},
         previewIds: hasNew && questions.length > 0 ? [...t.remainingOrder] : [],
+        combo: newCombo(),
+        pet: null,
+        cardDraw: null,
+        reviveCards: 0,
       });
     } catch (err) {
       set({ phase: 'idle', error: err instanceof Error ? err.message : '加载今日队列失败' });
@@ -181,6 +199,10 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         inRelearnRound: false,
         relearnAttempts: {},
         previewIds: hasNew ? [...t.remainingOrder] : [],
+        combo: newCombo(),
+        pet: null,
+        cardDraw: null,
+        reviveCards: 0,
       });
       return true;
     } catch {
@@ -211,6 +233,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
       mirror: { ...s.mirror, [q.wordId]: result.next },
       buffer,
       wrongIds,
+      combo: nextCombo(s.combo, rating === 'remembered'),
       idx: s.idx + 1,
       summary: {
         total: s.summary.total + 1,
@@ -297,7 +320,7 @@ async function flushBuffer(
 
   set({ phase: 'submitting' });
   try {
-    const res = await api.submitReviews(s.buffer);
+    const res = await api.submitReviews(s.buffer, get().combo.best);
     // 成功：取消待执行的重试
     if (flushRetryTimer) {
       clearTimeout(flushRetryTimer);
@@ -322,6 +345,9 @@ async function flushBuffer(
       mirror,
       buffer: [],
       streak: res.streak,
+      pet: res.pet ?? get().pet,
+      cardDraw: res.cardDraw ?? get().cardDraw,
+      reviveCards: res.reviveCards ?? get().reviveCards,
       summary: { ...get().summary, graduated: get().summary.graduated + graduated },
       ...settlePhase(get()),
     });

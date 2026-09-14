@@ -18,6 +18,12 @@ export interface MeResponse {
   user: PublicUser;
   streak: number;
   dueCount: number;
+  /** P0 趣味化（§十） */
+  pet: PetInfo | null;
+  points: number;
+  cardsCount: number;
+  reviveCards: number;
+  cardDraw: CardDrawInfo;
 }
 
 export interface TodayItem {
@@ -73,6 +79,11 @@ export interface ReviewsResponse {
   results: ReviewResult[];
   streak: number;
   unlockedBadges: string[];
+  /** P0 趣味化（§十） */
+  pet?: PetInfo | null;
+  cardDraw?: CardDrawInfo;
+  todayMaxCombo?: number;
+  reviveCards?: number;
 }
 
 export interface PlacementQuestion {
@@ -124,4 +135,46 @@ export interface MyWordsResponse {
   pageSize: number;
   pages: number;
   items: MyWordItem[];
+}
+
+/* ── P0 趣味化：词苗 / 词卡抽卡（§十） ── */
+export interface PetInfo {
+  stageIdx: number;
+  stageLabel: string;
+  emoji: string;
+  treeAgeDays: number;
+  wilted: boolean;
+  reviveDeadline: string | null;
+  /** 枯萎中：距「学 5 词」自动救活还差几题（0 = 本次已满足） */
+  needsWords?: number;
+  revived?: boolean;
+  hardReset?: boolean;
+}
+
+export interface CardDrawInfo {
+  eligible: number;
+  remaining: number;
+}
+
+export type CardRarity = 'SR' | 'SSR' | 'UR';
+
+export interface CardItem {
+  wordId: string;
+  text: string;
+  phonetic?: string;
+  definitions: Array<{ pos?: string; meaning: string }>;
+  rarity: CardRarity;
+  obtainedAt: string;
+}
+
+export interface CollectionResponse {
+  items: CardItem[];
+  counts: { SR: number; SSR: number; UR: number; total: number };
+  points: number;
+  draw: CardDrawInfo;
+}
+
+export interface DrawResponse {
+  card: CardItem & { duplicate: boolean; pointsGained?: number };
+  remaining: number;
 }

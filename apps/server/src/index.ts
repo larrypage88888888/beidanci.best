@@ -9,6 +9,7 @@ import { reviewsRoutes } from './routes/reviews';
 import { wordbookRoutes } from './routes/wordbooks';
 import { devRoutes } from './routes/dev';
 import { myWordsRoutes } from './routes/myWords';
+import { cardsRoutes } from './routes/cards';
 import { materializeAllPlans } from './cron/materializePlans';
 
 /** Hono 应用组装（设计文档 §六·主要 API 面） */
@@ -45,6 +46,7 @@ app.route('/api/today', todayRoutes);
 app.route('/api/reviews', reviewsRoutes);
 app.route('/api', wordbookRoutes);
 app.route('/api/words', myWordsRoutes);
+app.route('/api/cards', cardsRoutes);
 app.route('/api/dev', devRoutes);
 
 export default {

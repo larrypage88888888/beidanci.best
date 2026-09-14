@@ -9,6 +9,7 @@ import TodayPage from './pages/TodayPage';
 import WordsPage from './pages/WordsPage';
 import StatsPage from './pages/StatsPage';
 import SettingsPage from './pages/SettingsPage';
+import CollectionPage from './pages/CollectionPage';
 
 /** 登录守卫 + 摸底引导：未登录去登录页；没做过摸底先去做题 */
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -73,6 +74,16 @@ export default function App() {
           <RequireAuth>
             <Layout>
               <StatsPage />
+            </Layout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/cards"
+        element={
+          <RequireAuth>
+            <Layout>
+              <CollectionPage />
             </Layout>
           </RequireAuth>
         }

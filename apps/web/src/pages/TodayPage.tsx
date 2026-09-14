@@ -8,8 +8,12 @@ import WordChoice from '../components/quiz/WordChoice';
 import SpellCard from '../components/quiz/SpellCard';
 import SpeakerButton from '../components/SpeakerButton';
 import ExampleSentence, { Highlighted } from '../components/ExampleSentence';
+import ComboBadge from '../components/ComboBadge';
+import PetCard from '../components/PetCard';
+import DrawCardButton, { DrawResultModal } from '../components/DrawCard';
+import { playCorrect, playWrong } from '../lib/sfx';
 import { autoSpeak, autoSpeakSequence } from '../lib/speech';
-import type { TodayItem } from '../lib/types';
+import type { DrawResponse, TodayItem } from '../lib/types';
 
 /** 今日学习：题型轮换 + 乐观调度 + 批量回写 */
 export default function TodayPage() {
@@ -41,6 +45,15 @@ export default function TodayPage() {
   const [locked, setLocked] = useState(false);
   useEffect(() => setLocked(s.phase === 'submitting'), [s.phase]);
 
+  // 抽卡结果弹窗 / 顶部小提示
+  const [drawResult, setDrawResult] = useState<DrawResponse | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(null), 2600);
+    return () => clearTimeout(t);
+  }, [notice]);
+
   // 完成页轮询：艾宾浩斯到点（5 分钟快闪 / 30 分钟二轮…）自动续上新一轮
   useEffect(() => {
     if (s.phase !== 'done') return;
@@ -59,13 +72,19 @@ export default function TodayPage() {
 
   async function handlePick(correct: boolean) {
     setLocked(true);
+    const prev = s.combo.count;
     await s.answer(correct ? 'remembered' : 'forgot');
+    if (correct) playCorrect(prev + 1);
+    else playWrong();
     setLocked(false);
   }
 
   async function handleSpellRate(rating: 'remembered' | 'fuzzy' | 'forgot') {
     setLocked(true);
+    const prev = s.combo.count;
     await s.answer(rating);
+    if (rating === 'remembered') playCorrect(prev + 1);
+    else playWrong();
     setLocked(false);
   }
 
@@ -85,6 +104,11 @@ export default function TodayPage() {
             🔥 连续打卡 <b className="text-orange-500">{s.streak}</b> 天 · 毕业了{' '}
             <b className="text-emerald-500">{s.summary.graduated}</b> 个词 🎓
           </p>
+          {s.combo.best >= 3 && (
+            <p className="mt-1 text-xs text-slate-400">
+              本场最高连击 <b className="text-fuchsia-500">{s.combo.best}</b> 🔥
+            </p>
+          )}
 
           {s.buffer.length > 0 && (
             <p className="mt-3 text-xs text-amber-500">
@@ -114,6 +138,28 @@ export default function TodayPage() {
             刷新账号数据
           </button>
         </div>
+
+        {/* P0 趣味化：词苗 + 抽卡 */}
+        <div className="mt-4">
+          <PetCard pet={s.pet} reviveCards={s.reviveCards} />
+        </div>
+        <div className="mt-3">
+          <DrawCardButton
+            remaining={s.cardDraw?.remaining ?? 0}
+            onDrawn={(res) => setDrawResult(res)}
+            onError={(msg) => setNotice(msg)}
+          />
+          <Link to="/cards" className="mt-2 block text-center text-xs text-slate-400 hover:text-slate-600">
+            查看词卡图鉴 🃏
+          </Link>
+        </div>
+
+        {notice && (
+          <p className="fixed inset-x-0 bottom-24 z-40 mx-auto w-fit rounded-full bg-slate-800/90 px-4 py-2 text-xs font-medium text-white shadow-lg">
+            {notice}
+          </p>
+        )}
+        {drawResult && <DrawResultModal result={drawResult} onClose={() => setDrawResult(null)} />}
       </div>
     );
   }
@@ -176,6 +222,9 @@ export default function TodayPage() {
           </p>
         </div>
         <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-bold text-orange-600">🔥 {s.streak}</span>
+      </div>
+      <div className="mb-2 flex justify-end">
+        <ComboBadge count={s.combo.count} best={s.combo.best} />
       </div>
       <div className="mb-8 h-1.5 overflow-hidden rounded-full bg-slate-200">
         <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all" style={{ width: `${progressPct}%` }} />

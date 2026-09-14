@@ -115,6 +115,10 @@ export const dailyStats = sqliteTable(
     reviewed: integer('reviewed').notNull().default(0),
     correctCount: integer('correct_count').notNull().default(0),
     totalCount: integer('total_count').notNull().default(0),
+    /** 当日最高连击（会话内 best 的当日纪录，抽卡加成/周报用） */
+    maxCombo: integer('max_combo').notNull().default(0),
+    /** 当日已抽词卡次数（抽卡资格扣减） */
+    cardsDrawn: integer('cards_drawn').notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.userId, t.date] })],
 );
@@ -128,4 +132,45 @@ export const achievements = sqliteTable(
     unlockedAt: text('unlocked_at').notNull(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.badgeKey] })],
+);
+
+/** 词苗养成（设计文档 §10.2 B5）——树龄 = 有学习活动的累计天数 */
+export const userPets = sqliteTable('user_pets', {
+  userId: text('user_id').primaryKey(),
+  stageIdx: integer('stage_idx').notNull().default(0), // 0 词苗/1 小树/2 大树/3 开花
+  treeAgeDays: integer('tree_age_days').notNull().default(0),
+  lastWaterAt: text('last_water_at').notNull(), // YYYY-MM-DD (UTC)
+  wiltSince: text('wilt_since'), // 首次断签日
+  reviveDeadline: text('revive_deadline'), // 救活截止日（含）
+  wilted: integer('wilted', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull(),
+});
+
+/** 词卡图鉴（A2）：每人每词一张，稀有度 SR/SSR/UR */
+export const userCards = sqliteTable(
+  'user_cards',
+  {
+    userId: text('user_id').notNull(),
+    wordId: text('word_id').notNull(),
+    rarity: text('rarity').notNull(),
+    obtainedAt: text('obtained_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.wordId] })],
+);
+
+/** 词力积分（重复词卡转换 / 兑换装饰） */
+export const userPoints = sqliteTable('user_points', {
+  userId: text('user_id').primaryKey(),
+  balance: integer('balance').notNull().default(0),
+});
+
+/** 道具库存（P0 用：复活卡） */
+export const userInventory = sqliteTable(
+  'user_inventory',
+  {
+    userId: text('user_id').notNull(),
+    itemType: text('item_type').notNull(), // 'revive_card'
+    count: integer('count').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.itemType] })],
 );

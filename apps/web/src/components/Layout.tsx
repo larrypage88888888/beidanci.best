@@ -12,6 +12,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const navItems = [
     { to: '/today', label: '今日学习', icon: '📖' },
     { to: '/words', label: '词库', icon: '📚' },
+    { to: '/cards', label: '图鉴', icon: '🃏' },
     { to: '/stats', label: '统计', icon: '📊' },
     { to: '/settings', label: '设置', icon: '⚙️' },
   ];

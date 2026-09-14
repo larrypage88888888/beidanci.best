@@ -65,6 +65,26 @@ export { mulberry32, shuffleSeeded, buildDailyQueue, remainingNewQuota } from '.
 // streak 打卡
 export { todayKey, toDateKey, computeStreak, longestStreak } from './streak';
 
+// 趣味化 P0（§十）：连击 / 词苗养成 / 词卡抽卡
+export type { ComboState, PetRow, PetUpdateResult, CardRarity } from './gamification';
+export {
+  newCombo,
+  nextCombo,
+  comboLevel,
+  PET_STAGES,
+  petStageForAge,
+  REVIVE_WORD_COST,
+  shiftDateKey,
+  daysBetween,
+  updatePet,
+  CARD_RARITY_WEIGHTS,
+  DUPLICATE_POINTS,
+  CARD_ANSWER_THRESHOLD,
+  CARD_COMBO_EXTRA,
+  rollCardRarity,
+  cardDrawAllowance,
+} from './gamification';
+
 // 题型工厂
 export type { QuestionKind, QuizQuestion, ChoiceOption } from './quizFactory';
 export {

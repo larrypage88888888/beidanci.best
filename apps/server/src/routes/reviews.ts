@@ -3,8 +3,8 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
-import { achievements, dailyStats, reviewLogs, userWordStates, users } from '@app/db';
-import { computeStreak, isRating, schedule } from '@app/core';
+import { achievements, dailyStats, reviewLogs, userInventory, userPets, userWordStates, users } from '@app/db';
+import { PET_STAGES, cardDrawAllowance, computeStreak, isRating, schedule, updatePet } from '@app/core';
 import type { CardState, Rating } from '@app/core';
 import { requireAuth } from '../middleware/auth';
 import { randomId } from '../lib/jwt';
@@ -29,6 +29,8 @@ const ReviewItemSchema = z.object({
 });
 const BatchSchema = z.object({
   items: z.array(ReviewItemSchema).min(1).max(100),
+  /** 本次回写所在会话的当日最高连击（服务端做 MAX 合并，抽卡加成/周报用） */
+  maxCombo: z.number().int().min(0).max(99999).optional(),
 });
 
 reviewsRoutes.post('/', async (c) => {
@@ -37,8 +39,9 @@ reviewsRoutes.post('/', async (c) => {
   if (!parsed.success) {
     return c.json({ error: 'bad_request', message: parsed.error.issues[0]?.message ?? '参数错误' }, 400);
   }
-  const { items } = parsed.data;
+  const { items, maxCombo } = parsed.data;
   const db = getDb(c.env);
+  const maxComboIn = maxCombo ?? 0;
 
   // 用户当前调度模式（状态行不存模式列，统一按当前模式解释）
   const [user] = await db
@@ -152,7 +155,7 @@ reviewsRoutes.post('/', async (c) => {
   // batch 要求非空元组；items 已校验 min(1)，每个 item 产生 2 条语句
   await db.batch(stmts as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]]);
 
-  // daily_stats 原子累加（upsert + SQL 自增，避免读改写竞态）
+  // daily_stats 原子累加（upsert + SQL 自增，避免读改写竞态）；max_combo 取历史最大值
   await db
     .insert(dailyStats)
     .values({
@@ -162,6 +165,7 @@ reviewsRoutes.post('/', async (c) => {
       reviewed: reviewedDelta,
       correctCount: correctDelta,
       totalCount: reviewedDelta,
+      maxCombo: maxComboIn,
     })
     .onConflictDoUpdate({
       target: [dailyStats.userId, dailyStats.date],
@@ -170,6 +174,7 @@ reviewsRoutes.post('/', async (c) => {
         reviewed: sql`${dailyStats.reviewed} + ${reviewedDelta}`,
         correctCount: sql`${dailyStats.correctCount} + ${correctDelta}`,
         totalCount: sql`${dailyStats.totalCount} + ${reviewedDelta}`,
+        maxCombo: sql`MAX(${dailyStats.maxCombo}, ${maxComboIn})`,
       },
     });
 
@@ -192,5 +197,101 @@ reviewsRoutes.post('/', async (c) => {
       .onConflictDoNothing();
   }
 
-  return c.json({ results, streak, unlockedBadges });
+  // ── P0 趣味化：词苗养成 + 词卡抽卡资格（设计文档 §十）──
+  const [todayStats] = await db
+    .select()
+    .from(dailyStats)
+    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, date)))
+    .limit(1);
+
+  const [petRow] = await db.select().from(userPets).where(eq(userPets.userId, userId)).limit(1);
+  const [invRow] = await db
+    .select({ count: userInventory.count })
+    .from(userInventory)
+    .where(and(eq(userInventory.userId, userId), eq(userInventory.itemType, 'revive_card')))
+    .limit(1);
+  const invCount = invRow?.count ?? 0;
+  const petResult = updatePet(
+    petRow
+      ? {
+          stageIdx: (petRow.stageIdx ?? 0) as 0 | 1 | 2 | 3,
+          treeAgeDays: petRow.treeAgeDays,
+          lastWaterAt: petRow.lastWaterAt,
+          wiltSince: petRow.wiltSince,
+          reviveDeadline: petRow.reviveDeadline,
+          wilted: petRow.wilted,
+        }
+      : null,
+    { today: date, todayReviewed: todayStats?.reviewed ?? 0, hasReviveCard: invCount > 0 },
+  );
+
+  const petStmts: BatchItem<'sqlite'>[] = [];
+  if (petResult.grantReviveCard) {
+    petStmts.push(
+      db
+        .insert(userInventory)
+        .values({ userId, itemType: 'revive_card', count: 1 })
+        .onConflictDoNothing(),
+    );
+  }
+  if (petResult.consumedReviveCard) {
+    petStmts.push(
+      db
+        .update(userInventory)
+        .set({ count: sql`${userInventory.count} - 1` })
+        .where(and(eq(userInventory.userId, userId), eq(userInventory.itemType, 'revive_card'))),
+    );
+  }
+  petStmts.push(
+    db
+      .insert(userPets)
+      .values({
+        userId,
+        stageIdx: petResult.pet.stageIdx,
+        treeAgeDays: petResult.pet.treeAgeDays,
+        lastWaterAt: petResult.pet.lastWaterAt,
+        wiltSince: petResult.pet.wiltSince,
+        reviveDeadline: petResult.pet.reviveDeadline,
+        wilted: petResult.pet.wilted,
+        createdAt: nowStr,
+      })
+      .onConflictDoUpdate({
+        target: userPets.userId,
+        set: {
+          stageIdx: petResult.pet.stageIdx,
+          treeAgeDays: petResult.pet.treeAgeDays,
+          lastWaterAt: petResult.pet.lastWaterAt,
+          wiltSince: petResult.pet.wiltSince,
+          reviveDeadline: petResult.pet.reviveDeadline,
+          wilted: petResult.pet.wilted,
+        },
+      }),
+  );
+  await db.batch(petStmts as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]]);
+
+  const draw = cardDrawAllowance({
+    answeredToday: todayStats?.totalCount ?? 0,
+    comboBest: todayStats?.maxCombo ?? 0,
+    drawn: todayStats?.cardsDrawn ?? 0,
+  });
+
+  return c.json({
+    results,
+    streak,
+    unlockedBadges,
+    pet: {
+      stageIdx: petResult.pet.stageIdx,
+      stageLabel: PET_STAGES[petResult.pet.stageIdx].label,
+      emoji: PET_STAGES[petResult.pet.stageIdx].emoji,
+      treeAgeDays: petResult.pet.treeAgeDays,
+      wilted: petResult.pet.wilted,
+      reviveDeadline: petResult.pet.reviveDeadline,
+      needsWords: petResult.needsWords,
+      revived: petResult.revived,
+      hardReset: petResult.hardReset,
+    },
+    cardDraw: draw,
+    todayMaxCombo: todayStats?.maxCombo ?? 0,
+    reviveCards: Math.max(0, invCount + (petResult.grantReviveCard ? 1 : 0) - (petResult.consumedReviveCard ? 1 : 0)),
+  });
 });

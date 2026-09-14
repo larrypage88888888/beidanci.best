@@ -52,7 +52,7 @@ pnpm dev:web             # http://localhost:5173
 
 | 命令 | 作用 |
 |---|---|
-| `pnpm test` | core 单元测试（44 个用例：调度/迁移/组单/题型边界） |
+| `pnpm test` | core 单元测试（64 个用例：调度/迁移/组单/题型边界/连击/词苗/抽卡） |
 | `pnpm typecheck` | 全仓 TS 类型检查 |
 | `pnpm build` | 全仓构建 |
 | `pnpm --filter @app/web build` | 前端生产构建（含 SW 生成） |
@@ -64,6 +64,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/e2e-smoke.mjs [origin]` | 注册→登录→摸底→今日队列→批动作答→streak/徽章（12 步） |
 | `node scripts/e2e-review-loop.mjs [origin]` | 艾宾浩斯复习闭环：到期回归→快闪轮→级别晋升（8 步） |
 | `node scripts/e2e-modes.mjs [origin]` | FSRS↔艾宾浩斯模式切换进度迁移 + 每日新词配额（12 步） |
+| `node scripts/e2e-gamification.mjs [origin]` | P0 趣味化：连击纪录/词苗建卡/抽卡资格/图鉴/积分（12 步） |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设
@@ -73,23 +74,35 @@ pnpm dev:web             # http://localhost:5173
 
 ```
 POST /api/auth/register | login     注册/登录 → JWT
-GET  /api/me                        资料 + streak + 到期数
+GET  /api/me                        资料 + streak + 到期数 + 词苗/积分/图鉴/抽卡资格
 PATCH /api/me                       昵称/每日新词数/调度模式（含进度迁移）
 POST /api/placement/start           开始摸底
 POST /api/placement/answer          提交摸底作答 → 下一题或最终结果
 GET  /api/today                     今日队列（未物化则现算落库）
-POST /api/reviews                   批量权威回写 → 调度结果/streak/徽章
+POST /api/reviews                   批量权威回写 → 调度结果/streak/徽章/词苗/抽卡资格（含 maxCombo）
+GET  /api/cards/collection          词卡图鉴 + 词力积分 + 今日抽卡资格
+POST /api/cards/draw                抽词卡（重复自动转积分）
 GET  /api/wordbooks                 词书列表
 GET  /api/wordpack/:book/:version   词条包（KV 缓存 1h）
 GET  /api/health                    健康检查
 Cron UTC16:30                       每日计划预物化
 ```
 
+## 趣味化玩法（P0，设计文档 §十）
+
+| 功能 | 规则 |
+|---|---|
+| 🔥 连击 | 答对 +1 / 答错归零；5 连击火苗、10 连击电光、50 连击传说；当日最高连击 ≥10 → 抽卡 +1 次 |
+| 🌱 词苗养成 | 树龄 = 有学习活动的累计天数；0-2 词苗 / 3-6 小树 / 7-13 大树 / 14+ 开花 |
+| 🌧️ 断签救活 | 断签进入枯萎，48 小时内学满 5 词自动救活，或消耗复活卡（首次建苗赠送 1 张）；超期硬重置 |
+| 🎴 词卡抽卡 | 当日累计作答 ≥15 词 → 抽 1 次（从当天学过的词里抽）；SR/SSR/UR 稀有度；重复自动转词力积分 |
+| ✨ 词力积分 | 重复词卡转换所得（SR+5 / SSR+20 / UR+50），后续兑换装饰 |
+
 ## 部署到 Cloudflare（生产）
 
 1. `wrangler d1 create wordflow-db`、`wrangler kv namespace create CACHE`，
    把真实 id 填入 `apps/server/wrangler.jsonc`；
-2. 依次执行全部迁移（0001_init → 0005_app_meta，幂等）：
+2. 依次执行全部迁移（0001_init → 0006_gamification，幂等）：
    `wrangler d1 execute wordflow-db --remote --file=../../packages/db/migrations/000X_*.sql`；
 3. `wrangler secret put JWT_SECRET`；
 4. `pnpm --filter @app/server deploy`（静态资产可后续接入 Workers Static Assets 或 Pages）。
@@ -117,7 +130,7 @@ Cron UTC16:30                       每日计划预物化
 
 ```bash
 # 1) 让本地库结构与线上一致（0001~0005 都执行一遍，幂等可重复）
-for f in 0001_init 0002_seed_cet4 0003_add_example_columns 0004_seed_examples 0005_app_meta; do
+for f in 0001_init 0002_seed_cet4 0003_add_example_columns 0004_seed_examples 0005_app_meta 0006_gamification; do
   pnpm --filter @app/server exec wrangler d1 execute wordflow-db --local --file="../../packages/db/migrations/$f.sql"
 done
 

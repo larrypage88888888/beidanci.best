@@ -1,5 +1,7 @@
 import { getToken, setToken } from './token';
 import type {
+  CollectionResponse,
+  DrawResponse,
   MeResponse,
   MyWordsResponse,
   PlacementQuestion,
@@ -72,8 +74,15 @@ export const api = {
 
   today: () => request<TodayResponse>('/api/today'),
 
-  submitReviews: (items: Array<{ wordId: string; rating: string; latencyMs?: number }>) =>
-    request<ReviewsResponse>('/api/reviews', { method: 'POST', body: JSON.stringify({ items }) }),
+  submitReviews: (items: Array<{ wordId: string; rating: string; latencyMs?: number }>, maxCombo?: number) =>
+    request<ReviewsResponse>('/api/reviews', {
+      method: 'POST',
+      body: JSON.stringify({ items, ...(maxCombo != null ? { maxCombo } : {}) }),
+    }),
+
+  /** P0 趣味化：词卡图鉴 / 抽卡（§十） */
+  cardsCollection: () => request<CollectionResponse>('/api/cards/collection'),
+  cardsDraw: () => request<DrawResponse>('/api/cards/draw', { method: 'POST', body: '{}' }),
 
   placementStart: () =>
     request<{ question: PlacementQuestion; progress: { current: number; total: number }; sessionToken: string }>(

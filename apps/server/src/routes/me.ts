@@ -3,11 +3,11 @@ import { and, eq, lte, ne, isNull, sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
-import { dailyStats, userWordStates, users } from '@app/db';
-import { computeStreak, migrateCardState } from '@app/core';
+import { dailyStats, userCards, userInventory, userPets, userPoints, userWordStates, users } from '@app/db';
+import { PET_STAGES, cardDrawAllowance, computeStreak, migrateCardState } from '@app/core';
 import type { CardState } from '@app/core';
 import { publicUser } from './auth';
-import { nowIso } from '../lib/time';
+import { dateKeyUtc, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
 import { requireAuth } from '../middleware/auth';
 
@@ -56,12 +56,54 @@ meRoutes.get('/', async (c) => {
       ),
     );
 
+  // P0 趣味化（§十）：词苗 / 词力积分 / 图鉴数 / 复活卡 / 抽卡资格
+  const [pet, pointsRow, cardsRow, invRow] = await Promise.all([
+    petInfo(db, userId),
+    db.select().from(userPoints).where(eq(userPoints.userId, userId)).limit(1),
+    db.select({ n: sql<number>`count(*)` }).from(userCards).where(eq(userCards.userId, userId)),
+    db
+      .select({ count: userInventory.count })
+      .from(userInventory)
+      .where(and(eq(userInventory.userId, userId), eq(userInventory.itemType, 'revive_card')))
+      .limit(1),
+  ]);
+  const [today] = await db
+    .select()
+    .from(dailyStats)
+    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, dateKeyUtc())))
+    .limit(1);
+  const cardDraw = cardDrawAllowance({
+    answeredToday: today?.totalCount ?? 0,
+    comboBest: today?.maxCombo ?? 0,
+    drawn: today?.cardsDrawn ?? 0,
+  });
+
   return c.json({
     user: publicUser(user),
     streak,
     dueCount: Number(dueRow[0]?.n ?? 0) + Number(dueNullRow[0]?.n ?? 0),
+    pet,
+    points: pointsRow[0]?.balance ?? 0,
+    cardsCount: Number(cardsRow[0]?.n ?? 0),
+    reviveCards: invRow[0]?.count ?? 0,
+    cardDraw,
   });
 });
+
+/** 词苗展示信息（无则 null） */
+async function petInfo(db: ReturnType<typeof getDb>, userId: string) {
+  const [pet] = await db.select().from(userPets).where(eq(userPets.userId, userId)).limit(1);
+  if (!pet) return null;
+  const idx = (pet.stageIdx ?? 0) as 0 | 1 | 2 | 3;
+  return {
+    stageIdx: idx,
+    stageLabel: PET_STAGES[idx].label,
+    emoji: PET_STAGES[idx].emoji,
+    treeAgeDays: pet.treeAgeDays,
+    wilted: pet.wilted,
+    reviveDeadline: pet.reviveDeadline,
+  };
+}
 
 /** 模式切换：用共享核心的 migrateCardState 批量迁移既有状态（近似映射，不丢进度） */
 async function migrateStates(

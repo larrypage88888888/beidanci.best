@@ -50,3 +50,56 @@ body {
 .wf-pop {
   animation: wf-pop 0.35s ease-out;
 }
+
+/* ── P0 趣味化特效（§十）：连击 / 抽卡 ── */
+@keyframes wf-combo-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.35) rotate(-4deg);
+  }
+  70% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.wf-combo-pop {
+  animation: wf-combo-pop 0.35s ease-out;
+}
+
+@keyframes wf-fade-up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+}
+
+.wf-fade-up {
+  animation: wf-fade-up 1.4s ease-out forwards;
+}
+
+/* UR 传说卡光效 */
+@keyframes wf-glow-ur {
+  0%,
+  100% {
+    box-shadow: 0 0 12px 2px rgba(251, 191, 36, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 30px 10px rgba(251, 191, 36, 0.75);
+  }
+}
+
+.wf-glow-ur {
+  animation: wf-glow-ur 1.6s ease-in-out infinite;
+}
