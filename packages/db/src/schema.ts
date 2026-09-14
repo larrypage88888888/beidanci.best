@@ -12,6 +12,8 @@ export const wordbooks = sqliteTable('wordbooks', {
   levelTag: text('level_tag').notNull(), // 如 "CET-4"
   version: integer('version').notNull().default(1),
   description: text('description'),
+  /** C10 段位解锁门槛：0 青铜起，5 词霸（best_tier ≥ min_tier 才可选） */
+  minTier: integer('min_tier').notNull().default(0),
   createdAt: text('created_at').notNull(),
 });
 
@@ -173,4 +175,42 @@ export const userInventory = sqliteTable(
     count: integer('count').notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.userId, t.itemType] })],
+);
+
+/** C10 段位（§10.3）：每月结算一次，season = YYYY-MM */
+export const userSeasonRank = sqliteTable(
+  'user_season_rank',
+  {
+    userId: text('user_id').notNull(),
+    season: text('season').notNull(), // 'YYYY-MM'
+    tier: integer('tier').notNull().default(0),
+    score: real('score').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.season] })],
+);
+
+/** 历史最高段位（防落差打击；段位解锁依据） */
+export const userRankMeta = sqliteTable('user_rank_meta', {
+  userId: text('user_id').primaryKey(),
+  bestTier: integer('best_tier').notNull().default(0),
+  bestSeason: text('best_season'),
+  updatedAt: text('updated_at').notNull(),
+});
+
+/** 词根（C9 技能树） */
+export const wordRoots = sqliteTable('word_roots', {
+  root: text('root').primaryKey(), // 如 'spect'
+  affixType: text('affix_type').notNull(), // root | prefix | suffix
+  meaning: text('meaning').notNull(),
+  emoji: text('emoji'),
+});
+
+/** 词根 × 词条 映射 */
+export const wordRootMap = sqliteTable(
+  'word_root_map',
+  {
+    wordId: text('word_id').notNull(),
+    root: text('root').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.wordId, t.root] })],
 );

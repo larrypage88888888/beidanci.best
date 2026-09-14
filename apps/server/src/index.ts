@@ -10,7 +10,11 @@ import { wordbookRoutes } from './routes/wordbooks';
 import { devRoutes } from './routes/dev';
 import { myWordsRoutes } from './routes/myWords';
 import { cardsRoutes } from './routes/cards';
+import { rankRoutes } from './routes/rank';
+import { rootsRoutes } from './routes/roots';
 import { materializeAllPlans } from './cron/materializePlans';
+import { settleAllRanks } from './cron/settleRanks';
+import { isSeasonSettleDay } from '@app/core';
 
 /** Hono 应用组装（设计文档 §六·主要 API 面） */
 const app = new Hono<AppEnv>();
@@ -47,16 +51,21 @@ app.route('/api/reviews', reviewsRoutes);
 app.route('/api', wordbookRoutes);
 app.route('/api/words', myWordsRoutes);
 app.route('/api/cards', cardsRoutes);
+app.route('/api/rank', rankRoutes);
+app.route('/api/roots', rootsRoutes);
 app.route('/api/dev', devRoutes);
 
 export default {
   fetch: app.fetch,
 
-  /** Cron Triggers：每日计划预物化 */
+  /** Cron Triggers：每日计划预物化（UTC 16:30）+ 每月 1 号段位结算（UTC 00:30） */
   scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): void {
+    const job = isSeasonSettleDay()
+      ? settleAllRanks(env.DB)
+      : materializeAllPlans(env.DB);
     ctx.waitUntil(
-      materializeAllPlans(env.DB).catch((err) => {
-        console.error('scheduled materialize failed:', err);
+      job.catch((err) => {
+        console.error('scheduled job failed:', err);
       }),
     );
   },

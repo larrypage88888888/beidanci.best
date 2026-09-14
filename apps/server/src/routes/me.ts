@@ -3,12 +3,13 @@ import { and, eq, lte, ne, isNull, sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
-import { dailyStats, userCards, userInventory, userPets, userPoints, userWordStates, users } from '@app/db';
+import { dailyStats, userCards, userInventory, userPets, userPoints, userRankMeta, userWordStates, users, wordbooks } from '@app/db';
 import { PET_STAGES, cardDrawAllowance, computeStreak, migrateCardState } from '@app/core';
 import type { CardState } from '@app/core';
 import { publicUser } from './auth';
 import { dateKeyUtc, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
+import { computeUserRank } from '../lib/rankService';
 import { requireAuth } from '../middleware/auth';
 
 /**
@@ -22,6 +23,8 @@ const PatchSchema = z.object({
   nickname: z.string().min(1).max(30).optional(),
   dailyNewLimit: z.number().int().min(1).max(100).optional(),
   scheduleMode: z.enum(['ebbinghaus', 'fsrs']).optional(),
+  /** C10：切换目标词书（需段位解锁） */
+  goalBookId: z.string().min(1).max(40).optional(),
 });
 
 meRoutes.get('/', async (c) => {
@@ -78,6 +81,15 @@ meRoutes.get('/', async (c) => {
     drawn: today?.cardsDrawn ?? 0,
   });
 
+  // C10 段位概览（只读计算，不落库——结算在 /api/rank/current 与月度 Cron）
+  let rank: RankSummary | null = null;
+  try {
+    const r = await computeUserRank(db, userId, { persist: false });
+    rank = { tier: r.tier, tierLabel: r.tierLabel, tierEmoji: r.tierEmoji, score: r.score, bestTier: r.bestTier, bestTierLabel: r.bestTierLabel, bestTierEmoji: r.bestTierEmoji };
+  } catch {
+    rank = null; // 理论不失败；兜底不影响主流程
+  }
+
   return c.json({
     user: publicUser(user),
     streak,
@@ -87,8 +99,19 @@ meRoutes.get('/', async (c) => {
     cardsCount: Number(cardsRow[0]?.n ?? 0),
     reviveCards: invRow[0]?.count ?? 0,
     cardDraw,
+    rank,
   });
 });
+
+interface RankSummary {
+  tier: number;
+  tierLabel: string;
+  tierEmoji: string;
+  score: number;
+  bestTier: number;
+  bestTierLabel: string;
+  bestTierEmoji: string;
+}
 
 /** 词苗展示信息（无则 null） */
 async function petInfo(db: ReturnType<typeof getDb>, userId: string) {
@@ -157,6 +180,20 @@ meRoutes.patch('/', async (c) => {
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
 
+  // 切换词书：校验存在性 + 段位解锁门槛（历史最高段位 ≥ min_tier）
+  if (parsed.data.goalBookId) {
+    const [book] = await db
+      .select({ minTier: wordbooks.minTier })
+      .from(wordbooks)
+      .where(eq(wordbooks.id, parsed.data.goalBookId))
+      .limit(1);
+    if (!book) return c.json({ error: 'not_found', message: '词书不存在' }, 404);
+    const [meta] = await db.select().from(userRankMeta).where(eq(userRankMeta.userId, userId)).limit(1);
+    if ((meta?.bestTier ?? 0) < book.minTier) {
+      return c.json({ error: 'locked', message: '段位不足，暂未解锁该词书' }, 403);
+    }
+  }
+
   // 模式真正变化时才做状态迁移
   if (parsed.data.scheduleMode && parsed.data.scheduleMode !== user.scheduleMode) {
     await migrateStates(db, userId, user.scheduleMode, parsed.data.scheduleMode);
@@ -168,6 +205,7 @@ meRoutes.patch('/', async (c) => {
       ...(parsed.data.nickname !== undefined ? { nickname: parsed.data.nickname } : {}),
       ...(parsed.data.dailyNewLimit !== undefined ? { dailyNewLimit: parsed.data.dailyNewLimit } : {}),
       ...(parsed.data.scheduleMode !== undefined ? { scheduleMode: parsed.data.scheduleMode } : {}),
+      ...(parsed.data.goalBookId !== undefined ? { goalBookId: parsed.data.goalBookId } : {}),
     })
     .where(eq(users.id, userId))
     .returning();

@@ -24,6 +24,8 @@ export interface MeResponse {
   cardsCount: number;
   reviveCards: number;
   cardDraw: CardDrawInfo;
+  /** C10 段位概览（§10.3） */
+  rank: RankSummary | null;
 }
 
 export interface TodayItem {
@@ -177,4 +179,60 @@ export interface CollectionResponse {
 export interface DrawResponse {
   card: CardItem & { duplicate: boolean; pointsGained?: number };
   remaining: number;
+}
+
+/* ── P1 成长感：段位 / 词根技能树（§10.3） ── */
+export interface RankSummary {
+  tier: number;
+  tierLabel: string;
+  tierEmoji: string;
+  score: number;
+  bestTier: number;
+  bestTierLabel: string;
+  bestTierEmoji: string;
+}
+
+export interface RankResponse extends RankSummary {
+  season: string;
+  next: { tier: number; label: string; emoji: string; neededScore: number } | null;
+  breakdown: { vocabEstimate: number; correctRate7d: number | null; activeDays7d: number };
+}
+
+export interface RootFamilyWord {
+  wordId: string;
+  text: string;
+  lit: boolean;
+}
+
+export interface RootNode {
+  root: string;
+  affixType: string;
+  meaning: string;
+  emoji: string | null;
+  total: number;
+  learned: number;
+  lit: boolean;
+  family: RootFamilyWord[];
+}
+
+export interface RootsResponse {
+  roots: RootNode[];
+  learnedWords: number;
+  totalRoots: number;
+}
+
+export interface WordbookItem {
+  id: string;
+  name: string;
+  levelTag: string;
+  version: number;
+  description: string | null;
+  minTier: number;
+  locked: boolean;
+  lockedByTier: number | null;
+}
+
+export interface WordbooksResponse {
+  bestTier: number;
+  items: WordbookItem[];
 }

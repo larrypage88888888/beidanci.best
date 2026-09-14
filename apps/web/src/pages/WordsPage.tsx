@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { describeStage } from '@app/core';
 import { api } from '../lib/api';
-import type { MyWordItem, MyWordsResponse } from '../lib/types';
+import type { MyWordItem, MyWordsResponse, RootsResponse } from '../lib/types';
 import SpeakerButton from '../components/SpeakerButton';
 import { Highlighted } from '../components/ExampleSentence';
 
@@ -23,6 +23,7 @@ export default function WordsPage() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState<MyWordsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [roots, setRoots] = useState<RootsResponse | null>(null);
   const pageSize = 20;
 
   const load = useCallback(async () => {
@@ -41,6 +42,10 @@ export default function WordsPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    void api.roots().then(setRoots).catch(() => setRoots(null));
+  }, []);
+
   return (
     <div className="mx-auto max-w-md space-y-4 px-4 py-8">
       <div className="flex items-center justify-between">
@@ -57,6 +62,28 @@ export default function WordsPage() {
         <StatCard label="🌱 学手中" value={data?.learning ?? '—'} cls="text-blue-500" />
         <StatCard label="🎓 已毕业" value={data?.graduated ?? '—'} cls="text-emerald-500" />
       </div>
+
+      {/* C9 词根技能树摘要 */}
+      {roots && (
+        <Link
+          to="/roots"
+          className="flex items-center justify-between rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 p-5 text-white shadow transition hover:brightness-105"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">🌳</span>
+            <div>
+              <p className="font-extrabold leading-tight">词根技能树</p>
+              <p className="text-[11px] opacity-90">已掌握 {roots.learnedWords} 个家族词</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[11px] opacity-80">
+              点亮 {roots.roots.filter((r) => r.lit).length}/{roots.totalRoots}
+            </p>
+            <p className="mt-1 text-[11px] font-medium">查看 →</p>
+          </div>
+        </Link>
+      )}
 
       {/* 筛选 Tab */}
       <div className="flex gap-1.5 overflow-x-auto pb-0.5">

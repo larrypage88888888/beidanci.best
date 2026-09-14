@@ -7,8 +7,11 @@ import type {
   PlacementQuestion,
   PlacementResult,
   PublicUser,
+  RankResponse,
   ReviewsResponse,
+  RootsResponse,
   TodayResponse,
+  WordbooksResponse,
 } from './types';
 
 /** 极薄 fetch 封装：JSON + Bearer Token + 统一错误 */
@@ -69,7 +72,7 @@ export const api = {
     return request<MyWordsResponse>(`/api/words?${qs}`);
   },
 
-  updateMe: (patch: Partial<Pick<PublicUser, 'nickname' | 'dailyNewLimit' | 'scheduleMode'>>) =>
+  updateMe: (patch: Partial<Pick<PublicUser, 'nickname' | 'dailyNewLimit' | 'scheduleMode' | 'goalBookId'>>) =>
     request<{ user: PublicUser }>('/api/me', { method: 'PATCH', body: JSON.stringify(patch) }),
 
   today: () => request<TodayResponse>('/api/today'),
@@ -83,6 +86,11 @@ export const api = {
   /** P0 趣味化：词卡图鉴 / 抽卡（§十） */
   cardsCollection: () => request<CollectionResponse>('/api/cards/collection'),
   cardsDraw: () => request<DrawResponse>('/api/cards/draw', { method: 'POST', body: '{}' }),
+
+  /** P1 成长感：段位 / 词根技能树 / 词书解锁（§10.3） */
+  rankCurrent: () => request<RankResponse>('/api/rank/current'),
+  roots: () => request<RootsResponse>('/api/roots'),
+  wordbooks: () => request<WordbooksResponse>('/api/wordbooks'),
 
   placementStart: () =>
     request<{ question: PlacementQuestion; progress: { current: number; total: number }; sessionToken: string }>(

@@ -85,6 +85,19 @@ export {
   cardDrawAllowance,
 } from './gamification';
 
+// C10 段位（§10.3）
+export type { RankTier, RankInput, RankInfo } from './rank';
+export {
+  RANK_TIERS,
+  RANK_TIER_EMOJI,
+  RANK_TIER_THRESHOLDS,
+  computeRankScore,
+  tierForScore,
+  rankInfo,
+  seasonKey,
+  isSeasonSettleDay,
+} from './rank';
+
 // 题型工厂
 export type { QuestionKind, QuizQuestion, ChoiceOption } from './quizFactory';
 export {

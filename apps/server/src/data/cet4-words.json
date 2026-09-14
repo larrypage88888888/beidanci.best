@@ -1,102 +1,2199 @@
 [
-  { "text": "ability", "phonetic": "/əˈbɪləti/", "definitions": [{ "pos": "n.", "meaning": "能力，才能" }], "cefr": "A2", "frequencyRank": 2100, "tags": ["cet4"] },
-  { "text": "absorb", "phonetic": "/əbˈzɔːb/", "definitions": [{ "pos": "vt.", "meaning": "吸收；使专心" }], "cefr": "B1", "frequencyRank": 5400, "tags": ["cet4"] },
-  { "text": "abstract", "phonetic": "/ˈæbstrækt/", "definitions": [{ "pos": "adj.", "meaning": "抽象的" }, { "pos": "n.", "meaning": "摘要" }], "cefr": "B1", "frequencyRank": 6100, "tags": ["cet4"] },
-  { "text": "academic", "phonetic": "/ˌækəˈdemɪk/", "definitions": [{ "pos": "adj.", "meaning": "学术的；学业的" }], "cefr": "B1", "frequencyRank": 3300, "tags": ["cet4"] },
-  { "text": "accept", "phonetic": "/əkˈsept/", "definitions": [{ "pos": "vt.", "meaning": "接受；认可" }], "cefr": "A2", "frequencyRank": 1200, "tags": ["cet4"] },
-  { "text": "accompany", "phonetic": "/əˈkʌmpəni/", "definitions": [{ "pos": "vt.", "meaning": "陪伴，伴随" }], "cefr": "B1", "frequencyRank": 4800, "tags": ["cet4"] },
-  { "text": "accurate", "phonetic": "/ˈækjərət/", "definitions": [{ "pos": "adj.", "meaning": "准确的，精确的" }], "cefr": "B1", "frequencyRank": 4200, "tags": ["cet4"] },
-  { "text": "accuse", "phonetic": "/əˈkjuːz/", "definitions": [{ "pos": "vt.", "meaning": "指控，指责" }], "cefr": "B1", "frequencyRank": 4500, "tags": ["cet4"] },
-  { "text": "achieve", "phonetic": "/əˈtʃiːv/", "definitions": [{ "pos": "vt.", "meaning": "达到；实现" }], "cefr": "A2", "frequencyRank": 1600, "tags": ["cet4"] },
-  { "text": "acknowledge", "phonetic": "/əkˈnɒlɪdʒ/", "definitions": [{ "pos": "vt.", "meaning": "承认；致谢" }], "cefr": "B2", "frequencyRank": 6800, "tags": ["cet4"] },
-  { "text": "acquire", "phonetic": "/əˈkwaɪə/", "definitions": [{ "pos": "vt.", "meaning": "获得；习得" }], "cefr": "B2", "frequencyRank": 5900, "tags": ["cet4"] },
-  { "text": "adapt", "phonetic": "/əˈdæpt/", "definitions": [{ "pos": "vi./vt.", "meaning": "适应；改编" }], "cefr": "B1", "frequencyRank": 5000, "tags": ["cet4"] },
-  { "text": "adequate", "phonetic": "/ˈædɪkwət/", "definitions": [{ "pos": "adj.", "meaning": "充足的；适当的" }], "cefr": "B2", "frequencyRank": 6300, "tags": ["cet4"] },
-  { "text": "adjust", "phonetic": "/əˈdʒʌst/", "definitions": [{ "pos": "vt.", "meaning": "调整，调节" }], "cefr": "B1", "frequencyRank": 4600, "tags": ["cet4"] },
-  { "text": "admire", "phonetic": "/ədˈmaɪə/", "definitions": [{ "pos": "vt.", "meaning": "钦佩，赞赏" }], "cefr": "B1", "frequencyRank": 4300, "tags": ["cet4"] },
-  { "text": "admit", "phonetic": "/ədˈmɪt/", "definitions": [{ "pos": "vt.", "meaning": "承认；准许进入" }], "cefr": "A2", "frequencyRank": 2200, "tags": ["cet4"] },
-  { "text": "adopt", "phonetic": "/əˈdɒpt/", "definitions": [{ "pos": "vt.", "meaning": "采用；收养" }], "cefr": "B1", "frequencyRank": 4700, "tags": ["cet4"] },
-  { "text": "advance", "phonetic": "/ədˈvɑːns/", "definitions": [{ "pos": "vi.", "meaning": "前进；进展" }, { "pos": "n.", "meaning": "进步" }], "cefr": "B1", "frequencyRank": 2400, "tags": ["cet4"] },
-  { "text": "advantage", "phonetic": "/ədˈvɑːntɪdʒ/", "definitions": [{ "pos": "n.", "meaning": "优势，有利条件" }], "cefr": "A2", "frequencyRank": 1900, "tags": ["cet4"] },
-  { "text": "advocate", "phonetic": "/ˈædvəkeɪt/", "definitions": [{ "pos": "vt.", "meaning": "提倡，主张" }, { "pos": "n.", "meaning": "提倡者" }], "cefr": "B2", "frequencyRank": 7200, "tags": ["cet4"] },
-  { "text": "ambition", "phonetic": "/æmˈbɪʃn/", "definitions": [{ "pos": "n.", "meaning": "雄心，抱负" }], "cefr": "B1", "frequencyRank": 5600, "tags": ["cet4"] },
-  { "text": "amount", "phonetic": "/əˈmaʊnt/", "definitions": [{ "pos": "n.", "meaning": "数量，总额" }], "cefr": "A2", "frequencyRank": 1500, "tags": ["cet4"] },
-  { "text": "analyze", "phonetic": "/ˈænəlaɪz/", "definitions": [{ "pos": "vt.", "meaning": "分析" }], "cefr": "B1", "frequencyRank": 3100, "tags": ["cet4"] },
-  { "text": "anniversary", "phonetic": "/ˌænɪˈvɜːsəri/", "definitions": [{ "pos": "n.", "meaning": "周年纪念日" }], "cefr": "B1", "frequencyRank": 7400, "tags": ["cet4"] },
-  { "text": "announce", "phonetic": "/əˈnaʊns/", "definitions": [{ "pos": "vt.", "meaning": "宣布，声明" }], "cefr": "B1", "frequencyRank": 2800, "tags": ["cet4"] },
-  { "text": "annual", "phonetic": "/ˈænjuəl/", "definitions": [{ "pos": "adj.", "meaning": "每年的，年度的" }], "cefr": "B1", "frequencyRank": 3200, "tags": ["cet4"] },
-  { "text": "anticipate", "phonetic": "/ænˈtɪsɪpeɪt/", "definitions": [{ "pos": "vt.", "meaning": "预期，预料" }], "cefr": "B2", "frequencyRank": 7000, "tags": ["cet4"] },
-  { "text": "anxiety", "phonetic": "/æŋˈzaɪəti/", "definitions": [{ "pos": "n.", "meaning": "焦虑，担忧" }], "cefr": "B1", "frequencyRank": 5200, "tags": ["cet4"] },
-  { "text": "anxious", "phonetic": "/ˈæŋkʃəs/", "definitions": [{ "pos": "adj.", "meaning": "焦虑的；渴望的" }], "cefr": "A2", "frequencyRank": 3400, "tags": ["cet4"] },
-  { "text": "apologize", "phonetic": "/əˈpɒlədʒaɪz/", "definitions": [{ "pos": "vi.", "meaning": "道歉" }], "cefr": "A2", "frequencyRank": 6500, "tags": ["cet4"] },
-  { "text": "apparent", "phonetic": "/əˈpærənt/", "definitions": [{ "pos": "adj.", "meaning": "显然的；表面上的" }], "cefr": "B2", "frequencyRank": 5800, "tags": ["cet4"] },
-  { "text": "appeal", "phonetic": "/əˈpiːl/", "definitions": [{ "pos": "vi.", "meaning": "呼吁；有吸引力" }, { "pos": "n.", "meaning": "呼吁；吸引力" }], "cefr": "B1", "frequencyRank": 3900, "tags": ["cet4"] },
-  { "text": "appetite", "phonetic": "/ˈæpɪtaɪt/", "definitions": [{ "pos": "n.", "meaning": "食欲；欲望" }], "cefr": "B1", "frequencyRank": 6200, "tags": ["cet4"] },
-  { "text": "applaud", "phonetic": "/əˈplɔːd/", "definitions": [{ "pos": "vi./vt.", "meaning": "鼓掌；称赞" }], "cefr": "B2", "frequencyRank": 8100, "tags": ["cet4"] },
-  { "text": "appreciate", "phonetic": "/əˈpriːʃieɪt/", "definitions": [{ "pos": "vt.", "meaning": "感激；欣赏" }], "cefr": "B1", "frequencyRank": 3600, "tags": ["cet4"] },
-  { "text": "approach", "phonetic": "/əˈprəʊtʃ/", "definitions": [{ "pos": "n.", "meaning": "方法；接近" }, { "pos": "vt.", "meaning": "接近；着手处理" }], "cefr": "B1", "frequencyRank": 2000, "tags": ["cet4"] },
-  { "text": "appropriate", "phonetic": "/əˈprəʊpriət/", "definitions": [{ "pos": "adj.", "meaning": "恰当的，合适的" }], "cefr": "B2", "frequencyRank": 3700, "tags": ["cet4"] },
-  { "text": "approve", "phonetic": "/əˈpruːv/", "definitions": [{ "pos": "vt.", "meaning": "批准；赞成" }], "cefr": "B1", "frequencyRank": 3500, "tags": ["cet4"] },
-  { "text": "arbitrary", "phonetic": "/ˈɑːbɪtrəri/", "definitions": [{ "pos": "adj.", "meaning": "任意的；专断的" }], "cefr": "C1", "frequencyRank": 9200, "tags": ["cet4"] },
-  { "text": "assess", "phonetic": "/əˈses/", "definitions": [{ "pos": "vt.", "meaning": "评估，评定" }], "cefr": "B2", "frequencyRank": 4400, "tags": ["cet4"] },
-  { "text": "assume", "phonetic": "/əˈsjuːm/", "definitions": [{ "pos": "vt.", "meaning": "假定；承担" }], "cefr": "B1", "frequencyRank": 2300, "tags": ["cet4"] },
-  { "text": "attribute", "phonetic": "/əˈtrɪbjuːt/", "definitions": [{ "pos": "vt.", "meaning": "把…归因于" }, { "pos": "n.", "meaning": "属性" }], "cefr": "B2", "frequencyRank": 5300, "tags": ["cet4"] },
-  { "text": "authentic", "phonetic": "/ɔːˈθentɪk/", "definitions": [{ "pos": "adj.", "meaning": "真实的，真正的" }], "cefr": "B2", "frequencyRank": 7800, "tags": ["cet4"] },
-  { "text": "autonomous", "phonetic": "/ɔːˈtɒnəməs/", "definitions": [{ "pos": "adj.", "meaning": "自主的，自治的" }], "cefr": "C1", "frequencyRank": 11000, "tags": ["cet4"] },
-  { "text": "benchmark", "phonetic": "/ˈbentʃmɑːk/", "definitions": [{ "pos": "n.", "meaning": "基准，参照标准" }], "cefr": "C1", "frequencyRank": 10500, "tags": ["cet4"] },
-  { "text": "benefit", "phonetic": "/ˈbenɪfɪt/", "definitions": [{ "pos": "n.", "meaning": "益处，好处" }, { "pos": "vt.", "meaning": "有益于" }], "cefr": "A2", "frequencyRank": 1400, "tags": ["cet4"] },
-  { "text": "bias", "phonetic": "/ˈbaɪəs/", "definitions": [{ "pos": "n.", "meaning": "偏见，偏向" }], "cefr": "B2", "frequencyRank": 6000, "tags": ["cet4"] },
-  { "text": "boost", "phonetic": "/buːst/", "definitions": [{ "pos": "vt.", "meaning": "提升，推动" }, { "pos": "n.", "meaning": "推动，增长" }], "cefr": "B2", "frequencyRank": 4900, "tags": ["cet4"] },
-  { "text": "boundary", "phonetic": "/ˈbaʊndri/", "definitions": [{ "pos": "n.", "meaning": "边界，界限" }], "cefr": "B1", "frequencyRank": 4100, "tags": ["cet4"] },
-  { "text": "breakthrough", "phonetic": "/ˈbreɪkθruː/", "definitions": [{ "pos": "n.", "meaning": "突破，重大进展" }], "cefr": "B2", "frequencyRank": 8500, "tags": ["cet4"] },
-  { "text": "capacity", "phonetic": "/kəˈpæsəti/", "definitions": [{ "pos": "n.", "meaning": "容量；能力" }], "cefr": "B1", "frequencyRank": 2600, "tags": ["cet4"] },
-  { "text": "cease", "phonetic": "/siːs/", "definitions": [{ "pos": "vi./vt.", "meaning": "停止，终止" }], "cefr": "C1", "frequencyRank": 8800, "tags": ["cet4"] },
-  { "text": "challenge", "phonetic": "/ˈtʃælɪndʒ/", "definitions": [{ "pos": "n.", "meaning": "挑战" }, { "pos": "vt.", "meaning": "向…挑战；质疑" }], "cefr": "A2", "frequencyRank": 1700, "tags": ["cet4"] },
-  { "text": "circumstance", "phonetic": "/ˈsɜːkəmstəns/", "definitions": [{ "pos": "n.", "meaning": "环境；情况" }], "cefr": "B1", "frequencyRank": 2900, "tags": ["cet4"] },
-  { "text": "collaborate", "phonetic": "/kəˈlæbəreɪt/", "definitions": [{ "pos": "vi.", "meaning": "合作，协作" }], "cefr": "B2", "frequencyRank": 9500, "tags": ["cet4"] },
-  { "text": "commodity", "phonetic": "/kəˈmɒdəti/", "definitions": [{ "pos": "n.", "meaning": "商品，日用品" }], "cefr": "B2", "frequencyRank": 7600, "tags": ["cet4"] },
-  { "text": "compatible", "phonetic": "/kəmˈpætəbl/", "definitions": [{ "pos": "adj.", "meaning": "兼容的；合得来的" }], "cefr": "B2", "frequencyRank": 9000, "tags": ["cet4"] },
-  { "text": "compensate", "phonetic": "/ˈkɒmpenseɪt/", "definitions": [{ "pos": "vi./vt.", "meaning": "补偿，弥补" }], "cefr": "B2", "frequencyRank": 8000, "tags": ["cet4"] },
-  { "text": "competent", "phonetic": "/ˈkɒmpɪtənt/", "definitions": [{ "pos": "adj.", "meaning": "有能力的，胜任的" }], "cefr": "B2", "frequencyRank": 8600, "tags": ["cet4"] },
-  { "text": "comprehensive", "phonetic": "/ˌkɒmprɪˈhensɪv/", "definitions": [{ "pos": "adj.", "meaning": "全面的，综合的" }], "cefr": "B2", "frequencyRank": 3800, "tags": ["cet4"] },
-  { "text": "compromise", "phonetic": "/ˈkɒmprəmaɪz/", "definitions": [{ "pos": "n./vi.", "meaning": "妥协，折中" }], "cefr": "B2", "frequencyRank": 5700, "tags": ["cet4"] },
-  { "text": "conceal", "phonetic": "/kənˈsiːl/", "definitions": [{ "pos": "vt.", "meaning": "隐藏，隐瞒" }], "cefr": "C1", "frequencyRank": 9800, "tags": ["cet4"] },
-  { "text": "conceive", "phonetic": "/kənˈsiːv/", "definitions": [{ "pos": "vt.", "meaning": "构想，设想" }], "cefr": "C1", "frequencyRank": 10200, "tags": ["cet4"] },
-  { "text": "condemn", "phonetic": "/kənˈdem/", "definitions": [{ "pos": "vt.", "meaning": "谴责；判刑" }], "cefr": "B2", "frequencyRank": 8900, "tags": ["cet4"] },
-  { "text": "confirm", "phonetic": "/kənˈfɜːm/", "definitions": [{ "pos": "vt.", "meaning": "确认，证实" }], "cefr": "B1", "frequencyRank": 2500, "tags": ["cet4"] },
-  { "text": "consequence", "phonetic": "/ˈkɒnsɪkwəns/", "definitions": [{ "pos": "n.", "meaning": "后果，结果" }], "cefr": "B1", "frequencyRank": 2100, "tags": ["cet4"] },
-  { "text": "conservative", "phonetic": "/kənˈsɜːvətɪv/", "definitions": [{ "pos": "adj.", "meaning": "保守的" }], "cefr": "B2", "frequencyRank": 5500, "tags": ["cet4"] },
-  { "text": "considerable", "phonetic": "/kənˈsɪdərəbl/", "definitions": [{ "pos": "adj.", "meaning": "相当大（多）的" }], "cefr": "B1", "frequencyRank": 2700, "tags": ["cet4"] },
-  { "text": "contradict", "phonetic": "/ˌkɒntrəˈdɪkt/", "definitions": [{ "pos": "vt.", "meaning": "反驳；与…矛盾" }], "cefr": "B2", "frequencyRank": 10400, "tags": ["cet4"] },
-  { "text": "controversy", "phonetic": "/ˈkɒntrəvɜːsi/", "definitions": [{ "pos": "n.", "meaning": "争论，争议" }], "cefr": "B2", "frequencyRank": 6900, "tags": ["cet4"] },
-  { "text": "convince", "phonetic": "/kənˈvɪns/", "definitions": [{ "pos": "vt.", "meaning": "使确信，说服" }], "cefr": "B1", "frequencyRank": 3000, "tags": ["cet4"] },
-  { "text": "cooperate", "phonetic": "/kəʊˈɒpəreɪt/", "definitions": [{ "pos": "vi.", "meaning": "合作，配合" }], "cefr": "B1", "frequencyRank": 5100, "tags": ["cet4"] },
-  { "text": "criterion", "phonetic": "/kraɪˈtɪəriən/", "definitions": [{ "pos": "n.", "meaning": "标准，准则" }], "cefr": "C1", "frequencyRank": 11500, "tags": ["cet4"] },
-  { "text": "crucial", "phonetic": "/ˈkruːʃl/", "definitions": [{ "pos": "adj.", "meaning": "关键的，决定性的" }], "cefr": "B2", "frequencyRank": 3300, "tags": ["cet4"] },
-  { "text": "cultivate", "phonetic": "/ˈkʌltɪveɪt/", "definitions": [{ "pos": "vt.", "meaning": "培养；耕作" }], "cefr": "B2", "frequencyRank": 8200, "tags": ["cet4"] },
-  { "text": "decline", "phonetic": "/dɪˈklaɪn/", "definitions": [{ "pos": "vi.", "meaning": "下降；谢绝" }, { "pos": "n.", "meaning": "衰退" }], "cefr": "B1", "frequencyRank": 3200, "tags": ["cet4"] },
-  { "text": "dedicate", "phonetic": "/ˈdedɪkeɪt/", "definitions": [{ "pos": "vt.", "meaning": "把…献给；专注于" }], "cefr": "B2", "frequencyRank": 8700, "tags": ["cet4"] },
-  { "text": "demonstrate", "phonetic": "/ˈdemənstreɪt/", "definitions": [{ "pos": "vt.", "meaning": "证明；演示" }], "cefr": "B1", "frequencyRank": 3400, "tags": ["cet4"] },
-  { "text": "distribute", "phonetic": "/dɪˈstrɪbjuːt/", "definitions": [{ "pos": "vt.", "meaning": "分发；分布" }], "cefr": "B1", "frequencyRank": 4800, "tags": ["cet4"] },
-  { "text": "diverse", "phonetic": "/daɪˈvɜːs/", "definitions": [{ "pos": "adj.", "meaning": "多样的，不同的" }], "cefr": "B2", "frequencyRank": 5400, "tags": ["cet4"] },
-  { "text": "economy", "phonetic": "/ɪˈkɒnəmi/", "definitions": [{ "pos": "n.", "meaning": "经济；节约" }], "cefr": "A2", "frequencyRank": 1800, "tags": ["cet4"] },
-  { "text": "eliminate", "phonetic": "/ɪˈlɪmɪneɪt/", "definitions": [{ "pos": "vt.", "meaning": "消除，淘汰" }], "cefr": "B1", "frequencyRank": 4700, "tags": ["cet4"] },
-  { "text": "emphasis", "phonetic": "/ˈemfəsɪs/", "definitions": [{ "pos": "n.", "meaning": "强调，重点" }], "cefr": "B1", "frequencyRank": 3800, "tags": ["cet4"] },
-  { "text": "enable", "phonetic": "/ɪˈneɪbl/", "definitions": [{ "pos": "vt.", "meaning": "使能够" }], "cefr": "B1", "frequencyRank": 2200, "tags": ["cet4"] },
-  { "text": "encounter", "phonetic": "/ɪnˈkaʊntə/", "definitions": [{ "pos": "vt./n.", "meaning": "遭遇；邂逅" }], "cefr": "B1", "frequencyRank": 5000, "tags": ["cet4"] },
-  { "text": "enhance", "phonetic": "/ɪnˈhɑːns/", "definitions": [{ "pos": "vt.", "meaning": "提高，增强" }], "cefr": "B2", "frequencyRank": 4200, "tags": ["cet4"] },
-  { "text": "enormous", "phonetic": "/ɪˈnɔːməs/", "definitions": [{ "pos": "adj.", "meaning": "巨大的，庞大的" }], "cefr": "B1", "frequencyRank": 4000, "tags": ["cet4"] },
-  { "text": "ensure", "phonetic": "/ɪnˈʃʊə/", "definitions": [{ "pos": "vt.", "meaning": "确保，保证" }], "cefr": "B1", "frequencyRank": 2400, "tags": ["cet4"] },
-  { "text": "establish", "phonetic": "/ɪˈstæblɪʃ/", "definitions": [{ "pos": "vt.", "meaning": "建立；确立" }], "cefr": "B1", "frequencyRank": 1900, "tags": ["cet4"] },
-  { "text": "evaluate", "phonetic": "/ɪˈvæljueɪt/", "definitions": [{ "pos": "vt.", "meaning": "评价，估计" }], "cefr": "B1", "frequencyRank": 3600, "tags": ["cet4"] },
-  { "text": "evident", "phonetic": "/ˈevɪdənt/", "definitions": [{ "pos": "adj.", "meaning": "明显的，显然的" }], "cefr": "B1", "frequencyRank": 4900, "tags": ["cet4"] },
-  { "text": "evolve", "phonetic": "/iˈvɒlv/", "definitions": [{ "pos": "vi./vt.", "meaning": "进化；逐步发展" }], "cefr": "B2", "frequencyRank": 6600, "tags": ["cet4"] },
-  { "text": "exceed", "phonetic": "/ɪkˈsiːd/", "definitions": [{ "pos": "vt.", "meaning": "超过，超出" }], "cefr": "B1", "frequencyRank": 5900, "tags": ["cet4"] },
-  { "text": "facilitate", "phonetic": "/fəˈsɪlɪteɪt/", "definitions": [{ "pos": "vt.", "meaning": "促进，使便利" }], "cefr": "C1", "frequencyRank": 9700, "tags": ["cet4"] },
-  { "text": "fundamental", "phonetic": "/ˌfʌndəˈmentl/", "definitions": [{ "pos": "adj.", "meaning": "基本的，根本的" }], "cefr": "B1", "frequencyRank": 2500, "tags": ["cet4"] },
-  { "text": "generate", "phonetic": "/ˈdʒenəreɪt/", "definitions": [{ "pos": "vt.", "meaning": "产生；引起" }], "cefr": "B1", "frequencyRank": 3100, "tags": ["cet4"] },
-  { "text": "hypothesis", "phonetic": "/haɪˈpɒθəsɪs/", "definitions": [{ "pos": "n.", "meaning": "假说，假设" }], "cefr": "C1", "frequencyRank": 10800, "tags": ["cet4"] },
-  { "text": "implement", "phonetic": "/ˈɪmplɪment/", "definitions": [{ "pos": "vt.", "meaning": "实施，执行" }, { "pos": "n.", "meaning": "工具" }], "cefr": "B2", "frequencyRank": 4500, "tags": ["cet4"] },
-  { "text": "inevitable", "phonetic": "/ɪnˈevɪtəbl/", "definitions": [{ "pos": "adj.", "meaning": "不可避免的" }], "cefr": "B2", "frequencyRank": 7100, "tags": ["cet4"] },
-  { "text": "influence", "phonetic": "/ˈɪnfluəns/", "definitions": [{ "pos": "n./vt.", "meaning": "影响（力）" }], "cefr": "A2", "frequencyRank": 1300, "tags": ["cet4"] }
+  {
+    "text": "ability",
+    "phonetic": "/əˈbɪləti/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "能力，才能"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 2100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "absorb",
+    "phonetic": "/əbˈzɔːb/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "吸收；使专心"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "abstract",
+    "phonetic": "/ˈæbstrækt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "抽象的"
+      },
+      {
+        "pos": "n.",
+        "meaning": "摘要"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 6100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "academic",
+    "phonetic": "/ˌækəˈdemɪk/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "学术的；学业的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "accept",
+    "phonetic": "/əkˈsept/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "接受；认可"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "accompany",
+    "phonetic": "/əˈkʌmpəni/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "陪伴，伴随"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "accurate",
+    "phonetic": "/ˈækjərət/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "准确的，精确的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "accuse",
+    "phonetic": "/əˈkjuːz/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "指控，指责"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "achieve",
+    "phonetic": "/əˈtʃiːv/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "达到；实现"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "acknowledge",
+    "phonetic": "/əkˈnɒlɪdʒ/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "承认；致谢"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "acquire",
+    "phonetic": "/əˈkwaɪə/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "获得；习得"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "adapt",
+    "phonetic": "/əˈdæpt/",
+    "definitions": [
+      {
+        "pos": "vi./vt.",
+        "meaning": "适应；改编"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "adequate",
+    "phonetic": "/ˈædɪkwət/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "充足的；适当的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "adjust",
+    "phonetic": "/əˈdʒʌst/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "调整，调节"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "admire",
+    "phonetic": "/ədˈmaɪə/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "钦佩，赞赏"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "admit",
+    "phonetic": "/ədˈmɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "承认；准许进入"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 2200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "adopt",
+    "phonetic": "/əˈdɒpt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "采用；收养"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "advance",
+    "phonetic": "/ədˈvɑːns/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "前进；进展"
+      },
+      {
+        "pos": "n.",
+        "meaning": "进步"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "advantage",
+    "phonetic": "/ədˈvɑːntɪdʒ/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "优势，有利条件"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "advocate",
+    "phonetic": "/ˈædvəkeɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "提倡，主张"
+      },
+      {
+        "pos": "n.",
+        "meaning": "提倡者"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "ambition",
+    "phonetic": "/æmˈbɪʃn/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "雄心，抱负"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "amount",
+    "phonetic": "/əˈmaʊnt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "数量，总额"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "analyze",
+    "phonetic": "/ˈænəlaɪz/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "分析"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "anniversary",
+    "phonetic": "/ˌænɪˈvɜːsəri/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "周年纪念日"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 7400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "announce",
+    "phonetic": "/əˈnaʊns/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "宣布，声明"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "annual",
+    "phonetic": "/ˈænjuəl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "每年的，年度的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "anticipate",
+    "phonetic": "/ænˈtɪsɪpeɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "预期，预料"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "anxiety",
+    "phonetic": "/æŋˈzaɪəti/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "焦虑，担忧"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "anxious",
+    "phonetic": "/ˈæŋkʃəs/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "焦虑的；渴望的"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 3400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "apologize",
+    "phonetic": "/əˈpɒlədʒaɪz/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "道歉"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 6500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "apparent",
+    "phonetic": "/əˈpærənt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "显然的；表面上的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "appeal",
+    "phonetic": "/əˈpiːl/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "呼吁；有吸引力"
+      },
+      {
+        "pos": "n.",
+        "meaning": "呼吁；吸引力"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "appetite",
+    "phonetic": "/ˈæpɪtaɪt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "食欲；欲望"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 6200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "applaud",
+    "phonetic": "/əˈplɔːd/",
+    "definitions": [
+      {
+        "pos": "vi./vt.",
+        "meaning": "鼓掌；称赞"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "appreciate",
+    "phonetic": "/əˈpriːʃieɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "感激；欣赏"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "approach",
+    "phonetic": "/əˈprəʊtʃ/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "方法；接近"
+      },
+      {
+        "pos": "vt.",
+        "meaning": "接近；着手处理"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "appropriate",
+    "phonetic": "/əˈprəʊpriət/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "恰当的，合适的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 3700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "approve",
+    "phonetic": "/əˈpruːv/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "批准；赞成"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "arbitrary",
+    "phonetic": "/ˈɑːbɪtrəri/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "任意的；专断的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 9200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "assess",
+    "phonetic": "/əˈses/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "评估，评定"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 4400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "assume",
+    "phonetic": "/əˈsjuːm/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "假定；承担"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "attribute",
+    "phonetic": "/əˈtrɪbjuːt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "把…归因于"
+      },
+      {
+        "pos": "n.",
+        "meaning": "属性"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "authentic",
+    "phonetic": "/ɔːˈθentɪk/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "真实的，真正的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "autonomous",
+    "phonetic": "/ɔːˈtɒnəməs/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "自主的，自治的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "benchmark",
+    "phonetic": "/ˈbentʃmɑːk/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "基准，参照标准"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "benefit",
+    "phonetic": "/ˈbenɪfɪt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "益处，好处"
+      },
+      {
+        "pos": "vt.",
+        "meaning": "有益于"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "bias",
+    "phonetic": "/ˈbaɪəs/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "偏见，偏向"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "boost",
+    "phonetic": "/buːst/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "提升，推动"
+      },
+      {
+        "pos": "n.",
+        "meaning": "推动，增长"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 4900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "boundary",
+    "phonetic": "/ˈbaʊndri/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "边界，界限"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "breakthrough",
+    "phonetic": "/ˈbreɪkθruː/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "突破，重大进展"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "capacity",
+    "phonetic": "/kəˈpæsəti/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "容量；能力"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "cease",
+    "phonetic": "/siːs/",
+    "definitions": [
+      {
+        "pos": "vi./vt.",
+        "meaning": "停止，终止"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 8800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "challenge",
+    "phonetic": "/ˈtʃælɪndʒ/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "挑战"
+      },
+      {
+        "pos": "vt.",
+        "meaning": "向…挑战；质疑"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "circumstance",
+    "phonetic": "/ˈsɜːkəmstəns/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "环境；情况"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "collaborate",
+    "phonetic": "/kəˈlæbəreɪt/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "合作，协作"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "commodity",
+    "phonetic": "/kəˈmɒdəti/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "商品，日用品"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "compatible",
+    "phonetic": "/kəmˈpætəbl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "兼容的；合得来的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "compensate",
+    "phonetic": "/ˈkɒmpenseɪt/",
+    "definitions": [
+      {
+        "pos": "vi./vt.",
+        "meaning": "补偿，弥补"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "competent",
+    "phonetic": "/ˈkɒmpɪtənt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "有能力的，胜任的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "comprehensive",
+    "phonetic": "/ˌkɒmprɪˈhensɪv/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "全面的，综合的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 3800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "compromise",
+    "phonetic": "/ˈkɒmprəmaɪz/",
+    "definitions": [
+      {
+        "pos": "n./vi.",
+        "meaning": "妥协，折中"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "conceal",
+    "phonetic": "/kənˈsiːl/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "隐藏，隐瞒"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 9800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "conceive",
+    "phonetic": "/kənˈsiːv/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "构想，设想"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "condemn",
+    "phonetic": "/kənˈdem/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "谴责；判刑"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "confirm",
+    "phonetic": "/kənˈfɜːm/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "确认，证实"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "consequence",
+    "phonetic": "/ˈkɒnsɪkwəns/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "后果，结果"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "conservative",
+    "phonetic": "/kənˈsɜːvətɪv/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "保守的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "considerable",
+    "phonetic": "/kənˈsɪdərəbl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "相当大（多）的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "contradict",
+    "phonetic": "/ˌkɒntrəˈdɪkt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "反驳；与…矛盾"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 10400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "controversy",
+    "phonetic": "/ˈkɒntrəvɜːsi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "争论，争议"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "convince",
+    "phonetic": "/kənˈvɪns/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "使确信，说服"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "cooperate",
+    "phonetic": "/kəʊˈɒpəreɪt/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "合作，配合"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "criterion",
+    "phonetic": "/kraɪˈtɪəriən/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "标准，准则"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "crucial",
+    "phonetic": "/ˈkruːʃl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "关键的，决定性的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 3300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "cultivate",
+    "phonetic": "/ˈkʌltɪveɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "培养；耕作"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "decline",
+    "phonetic": "/dɪˈklaɪn/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "下降；谢绝"
+      },
+      {
+        "pos": "n.",
+        "meaning": "衰退"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "dedicate",
+    "phonetic": "/ˈdedɪkeɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "把…献给；专注于"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "demonstrate",
+    "phonetic": "/ˈdemənstreɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "证明；演示"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "distribute",
+    "phonetic": "/dɪˈstrɪbjuːt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "分发；分布"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "diverse",
+    "phonetic": "/daɪˈvɜːs/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "多样的，不同的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "economy",
+    "phonetic": "/ɪˈkɒnəmi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "经济；节约"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "eliminate",
+    "phonetic": "/ɪˈlɪmɪneɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "消除，淘汰"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "emphasis",
+    "phonetic": "/ˈemfəsɪs/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "强调，重点"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "enable",
+    "phonetic": "/ɪˈneɪbl/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "使能够"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "encounter",
+    "phonetic": "/ɪnˈkaʊntə/",
+    "definitions": [
+      {
+        "pos": "vt./n.",
+        "meaning": "遭遇；邂逅"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "enhance",
+    "phonetic": "/ɪnˈhɑːns/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "提高，增强"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 4200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "enormous",
+    "phonetic": "/ɪˈnɔːməs/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "巨大的，庞大的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "ensure",
+    "phonetic": "/ɪnˈʃʊə/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "确保，保证"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "establish",
+    "phonetic": "/ɪˈstæblɪʃ/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "建立；确立"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 1900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "evaluate",
+    "phonetic": "/ɪˈvæljueɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "评价，估计"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "evident",
+    "phonetic": "/ˈevɪdənt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "明显的，显然的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "evolve",
+    "phonetic": "/iˈvɒlv/",
+    "definitions": [
+      {
+        "pos": "vi./vt.",
+        "meaning": "进化；逐步发展"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "exceed",
+    "phonetic": "/ɪkˈsiːd/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "超过，超出"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "facilitate",
+    "phonetic": "/fəˈsɪlɪteɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "促进，使便利"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 9700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "fundamental",
+    "phonetic": "/ˌfʌndəˈmentl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "基本的，根本的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "generate",
+    "phonetic": "/ˈdʒenəreɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "产生；引起"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "hypothesis",
+    "phonetic": "/haɪˈpɒθəsɪs/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "假说，假设"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "implement",
+    "phonetic": "/ˈɪmplɪment/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "实施，执行"
+      },
+      {
+        "pos": "n.",
+        "meaning": "工具"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 4500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "inevitable",
+    "phonetic": "/ɪnˈevɪtəbl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "不可避免的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "influence",
+    "phonetic": "/ˈɪnfluəns/",
+    "definitions": [
+      {
+        "pos": "n./vt.",
+        "meaning": "影响（力）"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "biology",
+    "phonetic": "/biˈɒlədʒi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "生物学"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "biography",
+    "phonetic": "/baɪˈɒɡrəfi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "传记"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 7000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "antibiotic",
+    "phonetic": "/ˌæntibaɪˈɒtɪk/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "抗生素"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 10000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "geography",
+    "phonetic": "/dʒiˈɒɡrəfi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "地理（学）"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 3000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "geology",
+    "phonetic": "/dʒiˈɒlədʒi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "地质学"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "geometry",
+    "phonetic": "/dʒiˈɒmətri/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "几何（学）"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 8000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "paragraph",
+    "phonetic": "/ˈpærəɡrɑːf/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "段落"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 2500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "photograph",
+    "phonetic": "/ˈfəʊtəɡrɑːf/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "照片"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 2000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "graphic",
+    "phonetic": "/ˈɡræfɪk/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "图表的；生动的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "predict",
+    "phonetic": "/prɪˈdɪkt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "预测"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "verdict",
+    "phonetic": "/ˈvɜːdɪkt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "裁决；定论"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "produce",
+    "phonetic": "/prəˈdjuːs/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "生产；产生"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "introduce",
+    "phonetic": "/ˌɪntrəˈdjuːs/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "介绍；引入"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "conduct",
+    "phonetic": "/kənˈdʌkt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "实施；指挥"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "project",
+    "phonetic": "/ˈprɒdʒekt/；/prəˈdʒekt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "项目"
+      },
+      {
+        "pos": "vt.",
+        "meaning": "投射；规划"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 1200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "reject",
+    "phonetic": "/rɪˈdʒekt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "拒绝"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "inject",
+    "phonetic": "/ɪnˈdʒekt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "注射；注入"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 10000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "transport",
+    "phonetic": "/trænˈspɔːt/",
+    "definitions": [
+      {
+        "pos": "n./vt.",
+        "meaning": "运输"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "import",
+    "phonetic": "/ɪmˈpɔːt/",
+    "definitions": [
+      {
+        "pos": "n./vt.",
+        "meaning": "进口"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "support",
+    "phonetic": "/səˈpɔːt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "支持"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "inspect",
+    "phonetic": "/ɪnˈspekt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "检查"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6500,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "respect",
+    "phonetic": "/rɪˈspekt/",
+    "definitions": [
+      {
+        "pos": "n./vt.",
+        "meaning": "尊重"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "prospect",
+    "phonetic": "/ˈprɒspekt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "前景"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "structure",
+    "phonetic": "/ˈstrʌktʃə/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "结构"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "construct",
+    "phonetic": "/kənˈstrʌkt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "建造"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "instruct",
+    "phonetic": "/ɪnˈstrʌkt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "指导；指示"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6700,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "attract",
+    "phonetic": "/əˈtrækt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "吸引"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 2000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "extract",
+    "phonetic": "/ɪkˈstrækt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "提取"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "contract",
+    "phonetic": "/ˈkɒntrækt/；/kənˈtrækt/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "合同"
+      },
+      {
+        "pos": "v.",
+        "meaning": "收缩"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "visible",
+    "phonetic": "/ˈvɪzəbl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "可见的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4000,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "revise",
+    "phonetic": "/rɪˈvaɪz/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "修订；复习"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 6300,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "evidence",
+    "phonetic": "/ˈevɪdəns/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "证据"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "formal",
+    "phonetic": "/ˈfɔːml/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "正式的"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "transform",
+    "phonetic": "/trænsˈfɔːm/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "转变"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5200,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "inform",
+    "phonetic": "/ɪnˈfɔːm/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "通知"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "express",
+    "phonetic": "/ɪkˈspres/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "表达"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "impress",
+    "phonetic": "/ɪmˈpres/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "给…留下深刻印象"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 5600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "pressure",
+    "phonetic": "/ˈpreʃə/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "压力"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 2400,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "extend",
+    "phonetic": "/ɪkˈstend/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "延伸；扩展"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3100,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "intend",
+    "phonetic": "/ɪnˈtend/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "打算"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 3900,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "prevent",
+    "phonetic": "/prɪˈvent/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "阻止"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 1800,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "event",
+    "phonetic": "/ɪˈvent/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "事件"
+      }
+    ],
+    "cefr": "A2",
+    "frequencyRank": 1600,
+    "tags": [
+      "cet4"
+    ]
+  },
+  {
+    "text": "invent",
+    "phonetic": "/ɪnˈvent/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "发明"
+      }
+    ],
+    "cefr": "B1",
+    "frequencyRank": 4800,
+    "tags": [
+      "cet4"
+    ]
+  }
 ]

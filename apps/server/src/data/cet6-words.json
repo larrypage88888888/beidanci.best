@@ -1,0 +1,547 @@
+[
+  {
+    "text": "ambiguous",
+    "phonetic": "/æmˈbɪɡjuəs/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "模棱两可的；含糊不清的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8800,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "deteriorate",
+    "phonetic": "/dɪˈtɪəriəreɪt/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "恶化，变坏"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11200,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "elaborate",
+    "phonetic": "/ɪˈlæbərət/ /ɪˈlæbəreɪt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "精心制作的；复杂的"
+      },
+      {
+        "pos": "vi.",
+        "meaning": "详述"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 9400,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "feasible",
+    "phonetic": "/ˈfiːzəbl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "可行的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9200,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "hierarchy",
+    "phonetic": "/ˈhaɪərɑːki/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "等级制度；层级"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 9800,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "jurisdiction",
+    "phonetic": "/ˌdʒʊərɪsˈdɪkʃn/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "司法管辖权；管辖范围"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 13000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "legitimate",
+    "phonetic": "/lɪˈdʒɪtɪmət/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "合法的；正当的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "magnitude",
+    "phonetic": "/ˈmæɡnɪtjuːd/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "巨大；重要性"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "magnificent",
+    "phonetic": "/mæɡˈnɪfɪsnt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "壮丽的；宏伟的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8200,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "nourish",
+    "phonetic": "/ˈnʌrɪʃ/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "滋养；培养"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "obsolete",
+    "phonetic": "/ˈɒbsəliːt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "过时的；废弃的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12200,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "paradox",
+    "phonetic": "/ˈpærədɒks/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "悖论；自相矛盾的事物"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "phenomenon",
+    "phonetic": "/fəˈnɒmɪnən/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "现象"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 4600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "preliminary",
+    "phonetic": "/prɪˈlɪmɪnəri/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "初步的，预备的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 9600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "prosperity",
+    "phonetic": "/prɒˈsperəti/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "繁荣，兴旺"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8400,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "reconcile",
+    "phonetic": "/ˈrekənsaɪl/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "调和；使和解"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "redundant",
+    "phonetic": "/rɪˈdʌndənt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "多余的，冗余的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "skeptical",
+    "phonetic": "/ˈskeptɪkl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "怀疑的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 10000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "sophisticated",
+    "phonetic": "/səˈfɪstɪkeɪtɪd/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "复杂的；精密的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "subsidiary",
+    "phonetic": "/səbˈsɪdiəri/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "子公司"
+      },
+      {
+        "pos": "adj.",
+        "meaning": "辅助的；附属的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "substantial",
+    "phonetic": "/səbˈstænʃl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "大量的；实质的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 5600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "substantiate",
+    "phonetic": "/səbˈstænʃieɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "证实"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 14500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "terminate",
+    "phonetic": "/ˈtɜːmɪneɪt/",
+    "definitions": [
+      {
+        "pos": "v.",
+        "meaning": "终止；结束"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "transient",
+    "phonetic": "/ˈtrænziənt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "短暂的；转瞬即逝的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 13200,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "versatile",
+    "phonetic": "/ˈvɜːsətaɪl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "多才多艺的；多用途的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "vulnerable",
+    "phonetic": "/ˈvʌlnərəbl/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "脆弱的；易受伤害的"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 6900,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "withstand",
+    "phonetic": "/wɪðˈstænd/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "承受；经受住"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12600,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "abolish",
+    "phonetic": "/əˈbɒlɪʃ/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "废除"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 8500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "accumulate",
+    "phonetic": "/əˈkjuːmjəleɪt/",
+    "definitions": [
+      {
+        "pos": "vt./vi.",
+        "meaning": "积累，积聚"
+      }
+    ],
+    "cefr": "B2",
+    "frequencyRank": 7700,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "aggravate",
+    "phonetic": "/ˈæɡrəveɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "加剧；使恶化"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11800,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "alleviate",
+    "phonetic": "/əˈliːvieɪt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "减轻，缓解"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12200,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "appraisal",
+    "phonetic": "/əˈpreɪzl/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "评估；估价"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 13500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "articulate",
+    "phonetic": "/ɑːˈtɪkjuleɪt/；/ɑːˈtɪkjələt/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "清晰表达"
+      },
+      {
+        "pos": "adj.",
+        "meaning": "善于表达的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "aspiration",
+    "phonetic": "/ˌæspəˈreɪʃn/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "抱负，志向"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10800,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "assimilate",
+    "phonetic": "/əˈsɪməleɪt/",
+    "definitions": [
+      {
+        "pos": "vt./vi.",
+        "meaning": "同化；吸收"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12800,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "bewilder",
+    "phonetic": "/bɪˈwɪldə/",
+    "definitions": [
+      {
+        "pos": "vt.",
+        "meaning": "使迷惑，使困惑"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 13800,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "bureaucracy",
+    "phonetic": "/bjʊəˈrɒkrəsi/",
+    "definitions": [
+      {
+        "pos": "n.",
+        "meaning": "官僚机构；官僚主义"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "coincide",
+    "phonetic": "/ˌkəʊɪnˈsaɪd/",
+    "definitions": [
+      {
+        "pos": "vi.",
+        "meaning": "同时发生；一致"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 10500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "coherent",
+    "phonetic": "/kəʊˈhɪərənt/",
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meaning": "连贯的；条理清晰的"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 12000,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "complement",
+    "phonetic": "/ˈkɒmplɪment/",
+    "definitions": [
+      {
+        "pos": "n./vt.",
+        "meaning": "补充；互补"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 9500,
+    "tags": ["cet6"]
+  },
+  {
+    "text": "consolidate",
+    "phonetic": "/kənˈsɒlɪdeɪt/",
+    "definitions": [
+      {
+        "pos": "vt./vi.",
+        "meaning": "巩固；合并"
+      }
+    ],
+    "cefr": "C1",
+    "frequencyRank": 11800,
+    "tags": ["cet6"]
+  }
+]

@@ -1,17 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { difficultyToCefr, estimateVocabSize } from '@app/core';
+import { api } from '../lib/api';
+import type { RankResponse } from '../lib/types';
 import { useAuthStore } from '../stores/auth';
 import { useSessionStore } from '../stores/session';
 
-/** 统计页：水平轴、streak、今日数据（M0 版；M1 加徽章墙与留存曲线） */
+/** 统计页：水平轴、段位、streak、今日数据（M0 版；M1 加徽章墙与留存曲线） */
 export default function StatsPage() {
   const user = useAuthStore((s) => s.user);
   const streak = useAuthStore((s) => s.streak);
   const refreshMe = useAuthStore((s) => s.refreshMe);
   const session = useSessionStore();
+  const [rank, setRank] = useState<RankResponse | null>(null);
 
   useEffect(() => {
     void refreshMe();
+    void api.rankCurrent().then(setRank).catch(() => setRank(null));
   }, [refreshMe]);
 
   const level = user?.level ?? 50;
@@ -49,6 +54,31 @@ export default function StatsPage() {
           </div>
         </div>
       </div>
+
+      {/* C10 段位卡片 */}
+      {rank && (
+        <Link
+          to="/rank"
+          className="flex items-center justify-between rounded-2xl bg-gradient-to-br from-amber-400 to-rose-400 p-5 text-white shadow transition hover:brightness-105"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">{rank.tierEmoji}</span>
+            <div>
+              <p className="text-lg font-extrabold leading-tight">{rank.tierLabel}</p>
+              <p className="text-[11px] opacity-90">
+                评分 {rank.score}/100 · 赛季 {rank.season}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[11px] opacity-80">历史最高</p>
+            <p className="text-sm font-bold">
+              {rank.bestTierEmoji} {rank.bestTierLabel}
+            </p>
+            <p className="mt-1 text-[11px] font-medium">查看详情 →</p>
+          </div>
+        </Link>
+      )}
 
       {/* 今日数据 */}
       <div className="rounded-2xl bg-white p-5 shadow">

@@ -3,13 +3,13 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { sql } from 'drizzle-orm';
 import type { AppEnv } from '../env';
-import { words, wordbooks } from '@app/db';
+import { userRankMeta, words, wordbooks } from '@app/db';
 import { requireAuth } from '../middleware/auth';
 import { ensureWordDifficulties } from '../lib/difficultyPipeline';
 import { getDb } from '../lib/db';
 
 /**
- * GET /api/wordbooks               词书列表
+ * GET /api/wordbooks               词书列表（含 C10 段位解锁状态）
  * GET /api/wordpack/:book/:version 词条版本包（KV 缓存，难度懒计算后整体下发）
  */
 export const wordbookRoutes = new Hono<AppEnv>();
@@ -20,8 +20,21 @@ wordbookRoutes.use('/wordbooks/*', requireAuth);
 const VersionParam = z.coerce.number().int().positive();
 
 wordbookRoutes.get('/wordbooks', async (c) => {
-  const rows = await getDb(c.env).select().from(wordbooks);
-  return c.json({ items: rows });
+  const userId = c.get('userId');
+  const db = getDb(c.env);
+  const rows = await db.select().from(wordbooks);
+  // 段位解锁：历史最高段位 ≥ 门槛才可选（防落差打击）
+  const [meta] = await db.select().from(userRankMeta).where(eq(userRankMeta.userId, userId)).limit(1);
+  const bestTier = meta?.bestTier ?? 0;
+  return c.json({
+    bestTier,
+    items: rows.map((b) => ({
+      ...b,
+      minTier: b.minTier,
+      locked: b.minTier > bestTier,
+      lockedByTier: b.minTier > bestTier ? b.minTier : null,
+    })),
+  });
 });
 
 wordbookRoutes.get('/wordpack/:bookId/:version', async (c) => {

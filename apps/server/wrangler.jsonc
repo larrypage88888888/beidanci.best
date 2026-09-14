@@ -6,9 +6,11 @@
   "compatibility_date": "2024-12-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // 定时任务：UTC 16:30 = 北京时间 00:30，为当天物化每日学习计划
+  // 定时任务：
+  //   UTC 16:30 = 北京时间 00:30，为当天物化每日学习计划
+  //   UTC 00:30 每月 1 号 = 段位月度结算（C10）
   "triggers": {
-    "crons": ["30 16 * * *"]
+    "crons": ["30 16 * * *", "30 0 1 * *"]
   },
 
   // 自定义域名（beidanci.best 已托管于 Cloudflare 并开启代理）
