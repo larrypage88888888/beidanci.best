@@ -56,17 +56,27 @@ authRoutes.post('/register', async (c) => {
     return c.json({ error: 'conflict', message: '该邮箱已注册' }, 409);
   }
 
-  const [user] = await getDb(c.env)
-    .insert(users)
-    .values({
-      id: crypto.randomUUID(),
-      email: email.toLowerCase(),
-      nickname,
-      passwordHash: await hashPassword(password),
-      goalBookId: 'cet4', // M0 默认示例词书
-      createdAt: nowIso(),
-    })
-    .returning();
+  // 并发保护：即使上面的 SELECT 查重被两个请求同时绕过，UNIQUE 约束兜底返回 409
+  let user;
+  try {
+    [user] = await getDb(c.env)
+      .insert(users)
+      .values({
+        id: crypto.randomUUID(),
+        email: email.toLowerCase(),
+        nickname,
+        passwordHash: await hashPassword(password),
+        goalBookId: 'cet4', // M0 默认示例词书
+        createdAt: nowIso(),
+      })
+      .returning();
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/UNIQUE constraint failed/i.test(msg)) {
+      return c.json({ error: 'conflict', message: '该邮箱已注册' }, 409);
+    }
+    throw e;
+  }
 
   return c.json({ token: await issueToken(c, user.id), user: publicUser(user) }, 201);
 });
@@ -80,8 +90,18 @@ authRoutes.post('/login', async (c) => {
   const { email, password } = parsed.data;
 
   const [user] = await getDb(c.env).select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
-    return c.json({ error: 'invalid_credentials', message: '邮箱或密码错误' }, 401);
+  if (!user) {
+    // 区分「账号不存在」：本地开发时常因 D1 换库/重置导致账号消失，给出明确指引
+    return c.json(
+      {
+        error: 'user_not_found',
+        message: '账号不存在。如果你此前注册过，可能是本地数据库被重置/换库了（排查见 README「已知坑」）；也可以直接重新注册。',
+      },
+      401,
+    );
+  }
+  if (!(await verifyPassword(password, user.passwordHash))) {
+    return c.json({ error: 'bad_password', message: '邮箱或密码错误' }, 401);
   }
 
   return c.json({ token: await issueToken(c, user.id), user: publicUser(user) });

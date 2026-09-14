@@ -89,7 +89,8 @@ Cron UTC16:30                       每日计划预物化
 
 1. `wrangler d1 create wordflow-db`、`wrangler kv namespace create CACHE`，
    把真实 id 填入 `apps/server/wrangler.jsonc`；
-2. `wrangler d1 execute wordflow-db --remote --file=../../packages/db/migrations/0001_init.sql`（及种子）；
+2. 依次执行全部迁移（0001_init → 0005_app_meta，幂等）：
+   `wrangler d1 execute wordflow-db --remote --file=../../packages/db/migrations/000X_*.sql`；
 3. `wrangler secret put JWT_SECRET`；
 4. `pnpm --filter @app/server deploy`（静态资产可后续接入 Workers Static Assets 或 Pages）。
 
@@ -102,12 +103,34 @@ Cron UTC16:30                       每日计划预物化
 
 ## 已知坑
 
-- **改 wrangler.jsonc 的 `database_id` 会让本地 D1「换库」**：本地模拟器按 database_id
-  存放 SQLite 文件，ID 变了就是全新空库，需要重跑
-  `wrangler d1 execute wordflow-db --local --file=../../packages/db/migrations/000X_*.sql`；
+- **本地 D1 被重置/换库 → 「账号消失、同邮箱能重复注册」**：本地模拟器按 `database_id`
+  存放 SQLite 文件，ID 一变（或 `.wrangler` 被清理）就是全新空库，旧账号与进度全部"消失"，
+  同邮箱自然能重新注册。**排查**：登录报「账号不存在」时先看 `GET /api/health` 的
+  `dbInstance`——它是数据库实例身份标记（迁移 0005 生成），变了就说明这个环境换了库。
+  **恢复**：见下方「本地数据恢复」；平时注意别随手改 `wrangler.jsonc` 的 `database_id`，
+  改前先备份 `.wrangler/state/v3/d1/`。
 - **workers.dev 域名在国内被墙**：本地直连会 DNS 污染超时，测试走系统代理
   （Node 加 `NODE_USE_ENV_PROXY=1` + `HTTPS_PROXY`），正式使用建议绑定自定义域名；
 - **每日新词上限在「次日物化」时生效**：当天已生成的计划不会因下调 limit 而缩短。
+
+### 本地数据恢复（线上 → 本地）
+
+```bash
+# 1) 让本地库结构与线上一致（0001~0005 都执行一遍，幂等可重复）
+for f in 0001_init 0002_seed_cet4 0003_add_example_columns 0004_seed_examples 0005_app_meta; do
+  pnpm --filter @app/server exec wrangler d1 execute wordflow-db --local --file="../../packages/db/migrations/$f.sql"
+done
+
+# 2) 导出线上数据（仅数据，不含 schema）
+pnpm --filter @app/server exec wrangler d1 export wordflow-db --remote --no-schema --output .probe/remote-dump.sql
+
+# 3) 只导回用户数据表（words/wordbooks/app_meta 已由迁移种子覆盖，跳过避免主键冲突）
+Get-Content .probe/remote-dump.sql | Select-String -Pattern '^INSERT INTO (users|user_word_states|review_logs|daily_stats|daily_plans|achievements)\b' | ForEach-Object Line | Set-Content .probe/remote-users.sql -Encoding utf8
+
+# 4) 导入本地并验证
+pnpm --filter @app/server exec wrangler d1 execute wordflow-db --local --file=.probe/remote-users.sql
+pnpm --filter @app/server exec wrangler d1 execute wordflow-db --local --command "SELECT email,nickname,level FROM users"
+```
 
 ## 后续路线（对应文档里程碑）
 

@@ -22,8 +22,21 @@ app.onError((err, c) => {
   return c.json({ error: 'internal', message: '服务内部错误' }, 500);
 });
 
-// 健康检查
-app.get('/api/health', (c) => c.json({ ok: true, ts: Date.now() }));
+// 健康检查：dbInstance 是数据库实例身份（app_meta.instance_id），
+// 值变化 = 该环境的数据被重置/换库（本地 D1 常见），用于排查「账号消失」。
+app.get('/api/health', async (c) => {
+  let dbInstance: string | null = null;
+  try {
+    const row = (await c.env.DB.prepare("SELECT value FROM app_meta WHERE key = 'instance_id'").first()) as
+      | { value?: string }
+      | null
+      | undefined;
+    dbInstance = row?.value ?? null;
+  } catch {
+    dbInstance = null; // app_meta 不存在 = 该库从未执行迁移
+  }
+  return c.json({ ok: true, ts: Date.now(), dbInstance, migrated: dbInstance !== null });
+});
 
 app.route('/api/auth', authRoutes);
 app.route('/api/me', meRoutes);
