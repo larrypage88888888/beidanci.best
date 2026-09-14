@@ -243,3 +243,109 @@ M0 即含账号与云端调度（应用户要求后端从第一天参与），�
 2. **要不要 PvP 实时对战**：Durable Objects 让它在 CF 上成本可控，但复杂度仍在，MVP 可先不做。
 3. **是否必须上应用商店**：不必 → 纯 PWA 最省事。
 4. **默认调度模式**：我建议默认艾宾浩斯、设置里可切 FSRS；想反过来也是一句话的事。
+
+---
+
+## 十、趣味化增强方案（v1 定稿，2026-09 讨论）
+
+> 用户已从 A~F 六组方向中选定 **A 即时爽感 / B 损失厌恶与习惯 / C 成长感**，
+> 并逐一拍板 5 个决策（§10.1）。本节为定稿需求清单，落地顺序见 §10.8。
+
+### 10.1 定稿决策表
+
+| # | 决策 | 结论 |
+|---|---|---|
+| 1 | 断签宽恕 | **48 小时宽限救活**（复活卡或"学 5 词"） |
+| 2 | 抽卡重复词 | **自动转词力积分**（可兑换限定装饰/额外抽卡） |
+| 3 | 段位激励 | **段位解锁高阶 CEFR 词库**（黄金→B2、词霸→C1 等） |
+| 4 | 周报分享图 | **前端 canvas 生成**（服务端零负担） |
+| 5 | P0 范围 | **连击动画 + 词苗养成 + 词卡抽卡三件一起做**（共用会话结束页） |
+
+### 10.2 P0 详细规格
+
+**A1 连击动画**（纯前端，S）
+- 连击数字放大跳动；5 连起冒火、10 连换色、50 连全屏特效（CSS 过渡，M1 换 framer-motion）。
+- 音效用 WebAudio 合成（正确/错误短音），零资源依赖 R2。
+- 反馈文案池随机："稳了 / 离谱 / 词霸附体"。
+- 断连不扣已得 XP；连击按**会话内**计数，并记录**当日最高连击**（供周报/成就使用）。
+- 规则函数入 `@app/core`（纯函数可单测）。
+
+**B5 词苗养成**（前后端，M）
+- 把 streak 可视化为 词苗→小树→大树→开花结果（0-2 天 / 3-6 / 7-13 / 14+）。
+- 断签进入"枯萎"状态：**48 小时内**可用复活卡或"学 5 个词"救活；超时未救活则重置为 0 天（历史成就/树龄保留展示）。
+- 全勤节点（7/30/100 天）发限定装饰，接住现有 streak_3/streak_7 徽章。
+- 新表 `user_pet(user_id, stage, last_water_at, revive_deadline, tree_age_days)`。
+
+**A2 词卡抽卡**（前后端，M）
+- 每天首次学满 15 词 → 抽 1 张（从当天学过的词里抽）；当日连击≥10 额外 +1 次。
+- 稀有度：SSR 20% / UR 5%（随机）；卡面 = 词 + 渐变 + 一句话词源（AI 生成，KV 缓存复用）。
+- 抽到已收藏词 → 自动转词力积分；积分可兑换限定装饰/额外抽卡次数。
+- 图鉴收集进度 = 已收藏词 / 词库总数。
+- 新表 `user_cards(user_id, word_id, rarity, obtained_at)`、`user_points(user_id, balance)`。
+
+### 10.3 P1 规格（成长感）
+
+**C10 段位系统**（前后端，M）
+- 段位 = 词汇量估算 + 近 7 天正确率 + 活跃天数 → 青铜/白银/黄金/铂金/钻石/词霸。
+- 每月 1 号结算；保留"历史最高段位"防落差打击。
+- **段位解锁更高难度 CEFR 词包**（与动态选词闭环）。
+- 新表 `user_season_rank(user_id, season, tier, score)`。
+
+**C9 词根技能树**（前后端，M）
+- 种子词库提取 ~15 常用词根/词缀：学到含该词根的词 → 点亮节点，显示"已掌握 xx 家族 n/m 个"，未解锁灰显。
+- 前端 SVG/CSS 网络图（零依赖）；词根表先内置示例，M1 接全量开源词根表。
+- 新表 `word_roots(root, affix_type, meaning)`、`word_root_map(word_id, root)`。
+
+### 10.4 P2 规格（习惯层）
+
+- **C11 词力周报**：每周一 Cron 生成（新词数、复习准确率、最长连击、最强词根、周词力分=Σ 稳定度提升）；分享图前端 canvas。
+- **B8 智能提醒**：Cron 按用户活跃时段推送"今日词就绪 / 复习堆积快闪"；PWA Web Push（SW 订阅 + 授权引导），iOS 待 M2 Capacitor。
+- **B6 复活卡**：获取=分享/额外 5 词/节日；持有上限 3；新表 `user_inventory(user_id, item_type, count)`。
+- **B7 每日低保**：连续 7 天全勤给大奖；漏签只断"全勤链"不惩罚。
+
+### 10.5 P3 规格（内容层）
+
+- **A3 BOSS 战**：每周 BOSS = 1 高难词 + 5 易错词，90 秒限时关卡；解锁需相关词复习到 stage≥3；击杀得专属徽章 + 双倍 XP。新表 `boss_events`、`user_boss_progress`。单人离线可玩（无需 DO）。
+- **A4 AI 情绪化反馈**：作答后 ≤12 字短评，规则模板池 + AI 预生成池（按 rating×难度批量生成，KV 缓存随机取）。
+
+### 10.6 新增数据模型汇总
+
+```
+user_pet(user_id PK, stage, last_water_at, revive_deadline, tree_age_days)
+user_cards(user_id, word_id, rarity, obtained_at, PK(user_id, word_id))
+user_points(user_id PK, balance)
+user_season_rank(user_id, season, tier, score, PK(user_id, season))
+word_roots(root PK, affix_type, meaning)
+word_root_map(word_id, root, PK(word_id, root))
+user_inventory(user_id, item_type, count, PK(user_id, item_type))
+boss_events(week_id PK, word_ids[], started_at, ended_at)
+user_boss_progress(user_id, week_id, hp, done, PK(user_id, week_id))
+weekly_reports(user_id, week, json, PK(user_id, week))   -- 或按需现算
+```
+
+### 10.7 API 影响
+
+```
+POST /api/reviews  响应扩展：combo/当日最高连击、词苗状态、抽卡资格与抽卡结果（含转积分）
+GET  /api/me       扩展：词苗、段位、词力积分、收藏数
+POST /api/cards/draw         每日抽卡（校验资格）
+GET  /api/cards/collection   图鉴
+POST /api/revive             救活词苗（扣复活卡或完成学5词）
+GET  /api/rank/current       段位与赛季进度
+GET  /api/roots              词根树（含用户点亮状态）
+GET  /api/report/weekly      周报数据
+GET  /api/boss/current       本周 BOSS 关卡（P3）
+Cron：+3（每日提醒 / 周一周报 / 月初段位与 BOSS 结算）
+```
+
+### 10.8 里程碑增补
+
+| 阶段 | 内容 |
+|---|---|
+| **P0** | A1 连击动画 + B5 词苗养成（48h 救活）+ A2 词卡抽卡（含转积分）——共用"会话结束页" |
+| **P1** | C10 段位（解锁高阶词库）+ C9 词根技能树（15 词根示例） |
+| **P2** | C11 词力周报 + B8 智能提醒 + B6 复活卡 + B7 每日低保 |
+| **P3** | A3 BOSS 战 + A4 AI 情绪化反馈 |
+
+> 全部可长在现有 monorepo 上：core 加纯函数规则（可单测）、server 加路由/表/Cron、web 加组件；
+> AI 仅 P3 使用（Workers AI + KV 缓存控成本）；不推翻任何既有机制。
