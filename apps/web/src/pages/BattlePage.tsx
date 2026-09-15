@@ -54,7 +54,11 @@ export default function BattlePage() {
         setBosses(b);
         setPhase('list');
       })
-      .catch((e) => setNotice(e instanceof Error ? e.message : '加载失败'));
+      .catch((e) => {
+        // 失败也进入列表页（展示错误 + 重试），不再永久卡在 loading 骨架屏
+        setNotice(e instanceof Error ? e.message : '加载失败');
+        setPhase('list');
+      });
   }, []);
 
   async function start(boss: BattleBoss) {
@@ -124,6 +128,7 @@ export default function BattlePage() {
         setTimeout(() => {
           setResult(r);
           setPhase('done');
+          setBusy(false); // 结算展示窗口内禁止重复提交
         }, 700);
         return;
       }
@@ -139,10 +144,10 @@ export default function BattlePage() {
         setAnim(null);
         setSelId(null);
         setQ(r.next);
+        setBusy(false); // 动画窗口内禁止重复提交同一题
       }, 850);
     } catch (e) {
       setNotice(e instanceof Error ? e.message : '作答失败');
-    } finally {
       setBusy(false);
     }
   }
@@ -188,7 +193,7 @@ export default function BattlePage() {
           {/* 对手英雄 */}
           <div className="flex items-center gap-2">
             <Hero portrait="🧙" label="对手" hp={bossHp} maxHp={battle.boss.hp} />
-            <ManaGems mana={battle.total} max={battle.total} dim />
+            <ManaGems mana={3} max={3} dim />
             <div className="ml-auto flex gap-1">
               {[...Array(3)].map((_, i) => (
                 <span key={i} className="h-6 w-4 rounded-[4px] border border-amber-800 bg-gradient-to-br from-amber-700 to-amber-900" />

@@ -22,7 +22,7 @@ import type { CardDrawInfo, PetInfo, TodayItem, TodayResponse } from '../lib/typ
  * - 完成后 refreshQueue 轮询：新词到点（5 分钟快闪等）自动续上新一轮
  */
 
-type Phase = 'idle' | 'loading' | 'preview' | 'learning' | 'submitting' | 'relearn' | 'done';
+type Phase = 'idle' | 'loading' | 'preview' | 'learning' | 'submitting' | 'relearn' | 'done' | 'error';
 
 export interface SessionSummary {
   total: number;
@@ -83,6 +83,8 @@ interface SessionState {
 let questionStartAt = 0;
 /** 回写失败后的自动重试定时器（避免重复堆叠） */
 let flushRetryTimer: ReturnType<typeof setTimeout> | null = null;
+/** 回写是否在途（防止 online 事件/连点重试与在途提交并发导致同一批双发） */
+let flushInFlight = false;
 const FLUSH_RETRY_MS = 6_000;
 
 /** 由 /api/today 响应构建本地确定性题目 */
@@ -163,7 +165,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         reviveCards: 0,
       });
     } catch (err) {
-      set({ phase: 'idle', error: err instanceof Error ? err.message : '加载今日队列失败' });
+      // 终态 'error'（不回 idle）：避免 TodayPage 的 idle→loading 循环无限重试
+      set({ phase: 'error', error: err instanceof Error ? err.message : '加载今日队列失败' });
     }
   },
 
@@ -240,7 +243,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         remembered: s.summary.remembered + (rating === 'remembered' ? 1 : 0),
         fuzzy: s.summary.fuzzy + (rating === 'fuzzy' ? 1 : 0),
         forgot: s.summary.forgot + (rating === 'forgot' ? 1 : 0),
-        graduated: s.summary.graduated + (result.graduated ? 1 : 0),
+        // graduated 不做乐观累加：由服务端权威结果在 flushBuffer 确认后 +1，避免双计
+        graduated: s.summary.graduated,
       },
       phase: s.idx + 1 >= s.questions.length ? 'submitting' : 'learning',
     });
@@ -308,6 +312,8 @@ async function flushBuffer(
   set: (partial: Partial<SessionState>) => void,
   get: () => SessionState,
 ): Promise<void> {
+  // 在途保护：同一批作答只提交一次（online 事件/「立即重试」连点可能与在途提交并发）
+  if (flushInFlight) return;
   const s = get();
   if (s.buffer.length === 0) {
     if (flushRetryTimer) {
@@ -318,6 +324,7 @@ async function flushBuffer(
     return;
   }
 
+  flushInFlight = true;
   set({ phase: 'submitting' });
   try {
     const res = await api.submitReviews(s.buffer, get().combo.best);
@@ -344,6 +351,7 @@ async function flushBuffer(
     set({
       mirror,
       buffer: [],
+      error: null,
       streak: res.streak,
       pet: res.pet ?? get().pet,
       cardDraw: res.cardDraw ?? get().cardDraw,
@@ -358,6 +366,8 @@ async function flushBuffer(
       error: err instanceof Error ? `回写失败，稍后自动重试：${err.message}` : '回写失败',
     });
     scheduleFlushRetry(set, get);
+  } finally {
+    flushInFlight = false;
   }
 }
 
@@ -369,7 +379,9 @@ function scheduleFlushRetry(
   flushRetryTimer = setTimeout(() => {
     flushRetryTimer = null;
     const s = get();
-    if (s.buffer.length > 0 && s.phase !== 'submitting') {
+    // 队尾回写失败 phase 是 'submitting'，用 in-flight 标志而非 phase 判断，
+    // 否则队尾失败的自动重试会被永久判死
+    if (s.buffer.length > 0 && !flushInFlight) {
       void flushBuffer(set, get);
     }
   }, FLUSH_RETRY_MS);
