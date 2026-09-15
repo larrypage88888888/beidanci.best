@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ScheduleMode } from '@app/core';
 import { api } from '../lib/api';
@@ -20,6 +20,18 @@ export default function SettingsPage() {
   const [devMsg, setDevMsg] = useState<string | null>(null);
   const [devOk, setDevOk] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(() => speechAutoEnabled());
+  /** 每日新词上限草稿：受控滑块值（拖动即时反馈，停止后自动保存） */
+  const [limitDraft, setLimitDraft] = useState<number>(user?.dailyNewLimit ?? 10);
+  const limitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    setLimitDraft(user?.dailyNewLimit ?? 10);
+  }, [user?.dailyNewLimit]);
+  /** 滑块拖动：立即更新显示，500ms 防抖后自动保存（覆盖鼠标/触摸/键盘所有输入方式） */
+  function onLimitChange(v: number) {
+    setLimitDraft(v);
+    if (limitTimer.current) clearTimeout(limitTimer.current);
+    limitTimer.current = setTimeout(() => void patch({ dailyNewLimit: v }), 500);
+  }
 
   async function triggerFlash(count: number) {
     setDevBusy(true);
@@ -90,18 +102,25 @@ export default function SettingsPage() {
       <section className="rounded-2xl bg-white p-5 shadow">
         <div className="flex items-center justify-between">
           <p className="text-sm font-bold text-slate-700">每日新词上限</p>
-          <span className="text-sm font-extrabold text-blue-600">{user?.dailyNewLimit ?? 10} 个</span>
+          <span className="text-sm font-extrabold text-blue-600">{limitDraft} 个</span>
         </div>
         <input
           type="range"
           min={2}
           max={50}
           step={1}
-          defaultValue={user?.dailyNewLimit ?? 10}
-          onMouseUp={(e) => patch({ dailyNewLimit: Number((e.target as HTMLInputElement).value) })}
-          onTouchEnd={(e) => patch({ dailyNewLimit: Number((e.target as HTMLInputElement).value) })}
+          value={limitDraft}
+          onChange={(e) => onLimitChange(Number(e.target.value))}
+          onBlur={() => {
+            if (limitTimer.current) {
+              clearTimeout(limitTimer.current);
+              limitTimer.current = null;
+            }
+            if (limitDraft !== user?.dailyNewLimit) void patch({ dailyNewLimit: limitDraft });
+          }}
           className="mt-4 w-full accent-blue-600"
         />
+        <p className="mt-1 text-[10px] text-slate-300">松开或停止拖动 0.5 秒后自动保存 · 上限修改当天立即生效</p>
         <p className="mt-1 flex justify-between text-[10px] text-slate-300">
           <span>2</span>
           <span>50</span>
