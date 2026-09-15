@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import { and, asc, eq, inArray, isNotNull, isNull, lte, ne, or } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, ne, or } from 'drizzle-orm';
 import type { AppEnv } from '../env';
 import { dailyStats, userWordStates, users } from '@app/db';
 import { buildDailyQueue, computeStreak, hashSeed, remainingNewQuota } from '@app/core';
 import { requireAuth } from '../middleware/auth';
-import { dateKeyUtc, nowIso } from '../lib/time';
+import { dateKeyUtc, dayStartIso, nowIso } from '../lib/time';
 import { getOrBuildTodayPlan } from '../lib/todayBuilder';
 import { loadWordsByIds } from '../lib/wordQueries';
 import { ensureWordDifficulties } from '../lib/difficultyPipeline';
@@ -16,6 +16,10 @@ import { getDb } from '../lib/db';
  * 队列 = 到期复习词（due_at <= now，含今天刚学、5/30 分钟后到期的快闪轮次）
  *      ∪ 今日计划新词中「从未学过」的（学过一次后改走到期通道回归）
  *
+ * GET /api/today?mode=redo —— 重做今日单词（练习）
+ *      = 今天学过的未毕业词全部作为复习队列（不受到期状态限制），
+ *        供完成页「重做今日单词」随时重新进入做题流程（日常测试/主动巩固）。
+ *
  * 不再按「今天答过」剔除 —— 艾宾浩斯的意义就是让词在同一天多次回来。
  * 毕业词（due_at 为 NULL）自然排除；刚答完的词因 due_at 在未来也不会立即重复。
  */
@@ -25,59 +29,72 @@ todayRoutes.use('*', requireAuth);
 todayRoutes.get('/', async (c) => {
   const userId = c.get('userId');
   const date = dateKeyUtc();
+  const mode = c.req.query('mode') === 'redo' ? 'redo' : 'normal';
   const db = getDb(c.env);
 
   await ensureWordDifficulties(db);
 
-  const plan = await getOrBuildTodayPlan(db, userId, date);
-  if (!plan) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
-
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
   const [stats] = await db
     .select()
     .from(dailyStats)
     .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, date)))
     .limit(1);
 
-  // ── 1) 到期复习通道：权威状态里所有到期的词 ──
   const nowIsoStr = nowIso();
-  const dueRows = await db
-    .select({ wordId: userWordStates.wordId, stage: userWordStates.stage, dueAt: userWordStates.dueAt })
-    .from(userWordStates)
-    .where(
-      and(
-        eq(userWordStates.userId, userId),
-        isNotNull(userWordStates.dueAt),
-        lte(userWordStates.dueAt, nowIsoStr),
-        or(isNull(userWordStates.stage), ne(userWordStates.stage, 9)),
-      ),
-    )
-    .orderBy(asc(userWordStates.dueAt))
-    .limit(300);
 
-  // ── 2) 新词通道：今日计划的新词里还没学过的 ──
-  let freshNew = plan.newWordIds;
-  if (freshNew.length > 0) {
-    const stateRows = await db
-      .select({ wordId: userWordStates.wordId })
-      .from(userWordStates)
-      .where(and(eq(userWordStates.userId, userId), inArray(userWordStates.wordId, freshNew)));
-    const seen = new Set(stateRows.map((r) => r.wordId));
-    freshNew = freshNew.filter((id) => !seen.has(id));
+  // ── 1) 复习通道：normal = 到期词；redo = 今天学过的未毕业词（重做练习）──
+  const notGraduated = or(isNull(userWordStates.stage), ne(userWordStates.stage, 9));
+  const dueRows =
+    mode === 'redo'
+      ? await db
+          .select({ wordId: userWordStates.wordId, stage: userWordStates.stage, dueAt: userWordStates.dueAt })
+          .from(userWordStates)
+          .where(and(eq(userWordStates.userId, userId), gte(userWordStates.lastReviewAt, dayStartIso(date)), notGraduated))
+          .orderBy(asc(userWordStates.lastReviewAt))
+          .limit(300)
+      : await db
+          .select({ wordId: userWordStates.wordId, stage: userWordStates.stage, dueAt: userWordStates.dueAt })
+          .from(userWordStates)
+          .where(
+            and(
+              eq(userWordStates.userId, userId),
+              isNotNull(userWordStates.dueAt),
+              lte(userWordStates.dueAt, nowIsoStr),
+              notGraduated,
+            ),
+          )
+          .orderBy(asc(userWordStates.dueAt))
+          .limit(300);
+
+  // ── 2) 新词通道：仅 normal 模式 —— 今日计划的新词里还没学过的 ──
+  let freshNew: string[] = [];
+  if (mode === 'normal') {
+    const plan = await getOrBuildTodayPlan(db, userId, date);
+    if (!plan) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
+    freshNew = plan.newWordIds;
+    if (freshNew.length > 0) {
+      const stateRows = await db
+        .select({ wordId: userWordStates.wordId })
+        .from(userWordStates)
+        .where(and(eq(userWordStates.userId, userId), inArray(userWordStates.wordId, freshNew)));
+      const seen = new Set(stateRows.map((r) => r.wordId));
+      freshNew = freshNew.filter((id) => !seen.has(id));
+    }
+    // 按当前上限的剩余新词额度钳制（设置里改上限后立即生效，已学超过上限则不再补新词）
+    const limit = user?.dailyNewLimit ?? 10;
+    const used = stats?.newLearned ?? 0;
+    const remainingQuota = remainingNewQuota(limit, used);
+    if (remainingQuota < freshNew.length) freshNew = freshNew.slice(0, Math.max(0, remainingQuota));
   }
-
-  // 按当前上限的剩余新词额度钳制（设置里改上限后立即生效，已学超过上限则不再补新词）
-  const limit = user?.dailyNewLimit ?? 10;
-  const used = stats?.newLearned ?? 0;
-  const remainingQuota = remainingNewQuota(limit, used);
-  if (remainingQuota < freshNew.length) freshNew = freshNew.slice(0, Math.max(0, remainingQuota));
 
   // ── 3) 组单：到期词洗牌热身 + 未学新词穿插 ──
   const queue = buildDailyQueue({
     candidateNewWordIds: freshNew,
     dueReviewWordIds: dueRows.map((r) => r.wordId),
     newLimit: freshNew.length,
-    seed: hashSeed(`${userId}:${date}:dyn`),
+    seed: hashSeed(`${userId}:${date}:${mode}`),
   });
   const remaining = queue.order;
 
@@ -109,6 +126,7 @@ todayRoutes.get('/', async (c) => {
 
   return c.json({
     date,
+    mode,
     scheduleMode: user?.scheduleMode ?? 'ebbinghaus',
     level: user?.level ?? 50,
     streak,

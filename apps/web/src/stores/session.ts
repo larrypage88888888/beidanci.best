@@ -66,7 +66,7 @@ interface SessionState {
   /** 持有的复活卡数量 */
   reviveCards: number;
 
-  loadToday: () => Promise<void>;
+  loadToday: (mode?: 'normal' | 'redo') => Promise<void>;
   /** 完成页轮询：有新到期词则续上新一轮，返回是否恢复学习 */
   refreshQueue: () => Promise<boolean>;
   answer: (rating: Rating) => Promise<void>;
@@ -129,11 +129,11 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
 
   resetError: () => set({ error: null }),
 
-  loadToday: async () => {
+  loadToday: async (mode = 'normal') => {
     if (get().phase === 'loading') return;
     set({ phase: 'loading', error: null });
     try {
-      const t = await api.today();
+      const t = await api.today(mode);
       const { items, questions } = buildQuestions(t);
       questionStartAt = Date.now();
 

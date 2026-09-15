@@ -130,6 +130,20 @@ const me = await req('GET', '/api/me', { token });
 check('/api/me 返回对战加成后的抽卡资格', me.status === 200 && me.json?.cardDraw?.eligible >= 1,
   `eligible=${me.json?.cardDraw?.eligible}（作答+1 BOSS 胜利）`);
 
+/* 5.5 中途退出：释放今日次数，可重新挑战（修复：刷新/退出不再被锁一天） */
+const b3 = bs[2];
+const st3 = await req('POST', '/api/battle/start', { token, body: { bossId: b3.id } });
+check('第三个词灵可开战', st3.status === 200, `boss=${b3.name}`);
+const ab = await req('POST', '/api/battle/abandon', { token, body: { battleId: st3.json?.battleId } });
+check('中途退出成功（释放今日次数）', ab.status === 200 && ab.json?.ok === true);
+const bosses2 = await req('GET', '/api/battle/bosses', { token });
+const b3st = bosses2.json?.bosses?.find((b) => b.id === b3.id);
+check('退出后今日状态还原为可挑战', b3st?.playedToday === false && b3st?.wonToday === false);
+const st3b = await req('POST', '/api/battle/start', { token, body: { bossId: b3.id } });
+check('退出后可重新挑战', st3b.status === 200);
+await req('POST', '/api/battle/abandon', { token, body: { battleId: st3b.json?.battleId } });
+check('重复退出已结束战斗返回 409', (await req('POST', '/api/battle/abandon', { token, body: { battleId: st3b.json?.battleId } })).status === 409);
+
 /* 6. 另一个词灵全错 → LOSE（英雄血量耗尽，安慰奖） */
 const b2 = bs[1];
 const st2 = await req('POST', '/api/battle/start', { token, body: { bossId: b2.id } });

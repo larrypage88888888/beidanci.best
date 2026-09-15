@@ -69,6 +69,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/e2e-p1.mjs [origin]` | P1 成长感：段位结算/词书解锁门槛/词根树点亮/切词书（21 步） |
 | `node scripts/e2e-battle.mjs [origin]` | 炉石式卡牌对战：词灵列表/发手牌/全对 WIN（限定卡）/每日 409/全错 LOSE（19 步） |
 | `node scripts/e2e-settings.mjs [origin]` | 设置：每日新词上限修改当日立即生效（默认 10 → 5 → 30 → 10，10 步） |
+| `node scripts/e2e-redo.mjs [origin]` | 重做今日单词：完成后可再次进入做题（今日已学词转复习队列，12 步） |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设
@@ -88,9 +89,11 @@ GET  /api/cards/collection          词卡图鉴 + 词力积分 + 今日抽卡�
 POST /api/cards/draw                抽词卡（重复自动转积分）
 GET  /api/rank/current              段位与赛季进度（词汇量+7天正确率+活跃天数 → 青铜~词霸）
 GET  /api/roots                     词根技能树（15 词根，家族词点亮状态）
+GET  /api/today                    今日学习队列（?mode=redo 重做今日已学词，完成后可再次进入）
 GET  /api/battle/bosses             词灵 BOSS 列表（英雄 30/35/40）+ 今日挑战状态
 POST /api/battle/start              开战（每日每 BOSS 限 1 次；生成 10 题 + 随机发 5 张手牌）
 POST /api/battle/answer             逐题作答（答对召唤手牌随从出招/答错被反击，服务端权威判定，自动结算）
+POST /api/battle/abandon            中途退出：释放今日挑战次数（可重新挑战），不结算奖励
 GET  /api/wordbooks                 词书列表（含段位解锁状态 locked/minTier）
 GET  /api/wordpack/:book/:version   词条包（KV 缓存 1h）
 GET  /api/health                    健康检查

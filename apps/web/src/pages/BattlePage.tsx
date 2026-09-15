@@ -83,6 +83,23 @@ export default function BattlePage() {
     }
   }
 
+  /** 中途退出：释放今日挑战次数，可重新挑战 */
+  async function abandon() {
+    if (!battle || busy) return;
+    if (!window.confirm('退出本场战斗？今日挑战次数将释放，可重新挑战。')) return;
+    setBusy(true);
+    setNotice(null);
+    try {
+      await api.battleAbandon(battle.battleId);
+      setBosses(await api.battleBosses());
+      setPhase('list');
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : '退出失败');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function answer(picked?: string, typed?: string) {
     if (!battle || busy) return;
     setBusy(true);
@@ -152,9 +169,18 @@ export default function BattlePage() {
       <div className="mx-auto max-w-md px-4 py-6">
         <div className="mb-3 flex items-center justify-between">
           <h1 className="text-lg font-bold text-slate-800">⚔️ {battle.boss.emoji} {battle.boss.name}</h1>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-            回合 {answered + 1}/{battle.total}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+              回合 {answered + 1}/{battle.total}
+            </span>
+            <button
+              onClick={() => void abandon()}
+              disabled={busy}
+              className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500 transition hover:border-red-300 hover:text-red-500 disabled:opacity-40"
+            >
+              退出
+            </button>
+          </div>
         </div>
 
         {/* 战场 */}

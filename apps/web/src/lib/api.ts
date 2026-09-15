@@ -78,7 +78,7 @@ export const api = {
   updateMe: (patch: Partial<Pick<PublicUser, 'nickname' | 'dailyNewLimit' | 'scheduleMode' | 'goalBookId'>>) =>
     request<{ user: PublicUser }>('/api/me', { method: 'PATCH', body: JSON.stringify(patch) }),
 
-  today: () => request<TodayResponse>('/api/today'),
+  today: (mode?: 'normal' | 'redo') => request<TodayResponse>(`/api/today${mode === 'redo' ? '?mode=redo' : ''}`),
 
   submitReviews: (items: Array<{ wordId: string; rating: string; latencyMs?: number }>, maxCombo?: number) =>
     request<ReviewsResponse>('/api/reviews', {
@@ -104,6 +104,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ battleId, ...ans }),
     }),
+  battleAbandon: (battleId: number) =>
+    request<{ ok: boolean }>('/api/battle/abandon', { method: 'POST', body: JSON.stringify({ battleId }) }),
 
   placementStart: () =>
     request<{ question: PlacementQuestion; progress: { current: number; total: number }; sessionToken: string }>(

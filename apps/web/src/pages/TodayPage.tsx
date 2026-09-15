@@ -128,6 +128,20 @@ export default function TodayPage() {
             ⚡ 检查到期的快闪复习
           </button>
 
+          <button
+            onClick={() => void s.loadToday()}
+            className="mt-2 w-full rounded-xl border border-emerald-200 bg-white py-2.5 text-sm font-medium text-emerald-600 transition hover:bg-emerald-50"
+          >
+            🔁 再学一轮（有快闪/新词时自动续上）
+          </button>
+
+          <button
+            onClick={() => void s.loadToday('redo')}
+            className="mt-2 w-full rounded-xl border border-fuchsia-200 bg-white py-2.5 text-sm font-medium text-fuchsia-600 transition hover:bg-fuchsia-50"
+          >
+            📖 重做今日单词（练习，随时可重进做题）
+          </button>
+
           <Link
             to="/stats"
             className="mt-3 block w-full rounded-xl bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700"

@@ -154,11 +154,14 @@ cardsRoutes.post('/draw', async (c) => {
     await db.insert(userCards).values({ userId, wordId, rarity, obtainedAt: nowIso() });
   }
 
-  // 扣减今日抽卡次数
+  // 扣减今日抽卡次数（无当日统计行时兜底插入，防止次数不扣）
   await db
-    .update(dailyStats)
-    .set({ cardsDrawn: sql`${dailyStats.cardsDrawn} + 1` })
-    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, date)));
+    .insert(dailyStats)
+    .values({ userId, date, cardsDrawn: 1 })
+    .onConflictDoUpdate({
+      target: [dailyStats.userId, dailyStats.date],
+      set: { cardsDrawn: sql`${dailyStats.cardsDrawn} + 1` },
+    });
 
   const [w] = await loadWordsByIds(db, [wordId]);
   return c.json({

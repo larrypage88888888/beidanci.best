@@ -370,6 +370,37 @@ const AnswerSchema = z.object({
   cardId: z.string().max(40).optional(),
 });
 
+const AbandonSchema = z.object({ battleId: z.number().int().positive() });
+
+// POST /api/battle/abandon —— 中途退出：释放今日挑战次数（可重新挑战），不结算奖励
+battleRoutes.post('/abandon', async (c) => {
+  const userId = c.get('userId');
+  const db = getDb(c.env);
+  const parsed = AbandonSchema.safeParse(await c.req.json().catch(() => ({})));
+  if (!parsed.success) return c.json({ error: 'bad_request', message: '参数错误' }, 400);
+
+  const [battle] = await db
+    .select()
+    .from(userBattles)
+    .where(and(eq(userBattles.id, parsed.data.battleId), eq(userBattles.userId, userId)))
+    .limit(1);
+  if (!battle) return c.json({ error: 'not_found', message: '战斗不存在' }, 404);
+  if (battle.status !== 'pending') {
+    return c.json({ error: 'battle_finished', message: '这场战斗已经结束' }, 409);
+  }
+
+  await db
+    .update(userBattles)
+    .set({ status: 'abandoned', finishedAt: nowIso() })
+    .where(and(eq(userBattles.id, battle.id), eq(userBattles.userId, userId)));
+  // 释放今日占坑（start 时写入的 user_boss_daily）→ 可重新挑战
+  await db
+    .delete(userBossDaily)
+    .where(and(eq(userBossDaily.userId, userId), eq(userBossDaily.bossId, battle.bossId), eq(userBossDaily.date, dateKeyUtc())));
+
+  return c.json({ ok: true });
+});
+
 // POST /api/battle/answer —— 逐题作答（服务端权威判定，答完自动结算）
 battleRoutes.post('/answer', async (c) => {
   const userId = c.get('userId');
