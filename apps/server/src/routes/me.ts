@@ -3,7 +3,7 @@ import { and, eq, lte, ne, isNull, sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
-import { dailyStats, userCards, userInventory, userPets, userPoints, userRankMeta, userWordStates, users, wordbooks } from '@app/db';
+import { dailyPlans, dailyStats, userCards, userInventory, userPets, userPoints, userRankMeta, userWordStates, users, wordbooks } from '@app/db';
 import { PET_STAGES, cardDrawAllowance, computeStreak, migrateCardState } from '@app/core';
 import type { CardState } from '@app/core';
 import { publicUser } from './auth';
@@ -198,6 +198,13 @@ meRoutes.patch('/', async (c) => {
   // 模式真正变化时才做状态迁移
   if (parsed.data.scheduleMode && parsed.data.scheduleMode !== user.scheduleMode) {
     await migrateStates(db, userId, user.scheduleMode, parsed.data.scheduleMode);
+  }
+
+  // 每日新词上限变化 → 作废今日已物化计划（下次访问 /today 按新上限重建，立即生效）
+  if (parsed.data.dailyNewLimit !== undefined && parsed.data.dailyNewLimit !== user.dailyNewLimit) {
+    await db
+      .delete(dailyPlans)
+      .where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.date, dateKeyUtc())));
   }
 
   const [updated] = await db

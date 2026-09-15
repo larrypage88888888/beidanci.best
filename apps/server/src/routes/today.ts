@@ -32,6 +32,13 @@ todayRoutes.get('/', async (c) => {
   const plan = await getOrBuildTodayPlan(db, userId, date);
   if (!plan) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
 
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  const [stats] = await db
+    .select()
+    .from(dailyStats)
+    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, date)))
+    .limit(1);
+
   // ── 1) 到期复习通道：权威状态里所有到期的词 ──
   const nowIsoStr = nowIso();
   const dueRows = await db
@@ -58,6 +65,12 @@ todayRoutes.get('/', async (c) => {
     const seen = new Set(stateRows.map((r) => r.wordId));
     freshNew = freshNew.filter((id) => !seen.has(id));
   }
+
+  // 按当前上限的剩余新词额度钳制（设置里改上限后立即生效，已学超过上限则不再补新词）
+  const limit = user?.dailyNewLimit ?? 10;
+  const used = stats?.newLearned ?? 0;
+  const remainingQuota = remainingNewQuota(limit, used);
+  if (remainingQuota < freshNew.length) freshNew = freshNew.slice(0, Math.max(0, remainingQuota));
 
   // ── 3) 组单：到期词洗牌热身 + 未学新词穿插 ──
   const queue = buildDailyQueue({
@@ -93,13 +106,6 @@ todayRoutes.get('/', async (c) => {
   // streak 与今日统计
   const statRows = await db.select({ date: dailyStats.date }).from(dailyStats).where(eq(dailyStats.userId, userId));
   const streak = computeStreak(statRows.map((r) => r.date));
-
-  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-  const [stats] = await db
-    .select()
-    .from(dailyStats)
-    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, date)))
-    .limit(1);
 
   return c.json({
     date,

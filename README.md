@@ -68,6 +68,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/e2e-gamification.mjs [origin]` | P0 趣味化：连击纪录/词苗建卡/抽卡资格/图鉴/积分（12 步） |
 | `node scripts/e2e-p1.mjs [origin]` | P1 成长感：段位结算/词书解锁门槛/词根树点亮/切词书（21 步） |
 | `node scripts/e2e-battle.mjs [origin]` | 炉石式卡牌对战：词灵列表/发手牌/全对 WIN（限定卡）/每日 409/全错 LOSE（19 步） |
+| `node scripts/e2e-settings.mjs [origin]` | 设置：每日新词上限修改当日立即生效（默认 10 → 5 → 30 → 10，10 步） |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设
@@ -78,7 +79,7 @@ pnpm dev:web             # http://localhost:5173
 ```
 POST /api/auth/register | login     注册/登录 → JWT
 GET  /api/me                        资料 + streak + 到期数 + 词苗/积分/图鉴/抽卡资格 + 段位概览
-PATCH /api/me                       昵称/每日新词数/调度模式/目标词书（词书需段位解锁）
+PATCH /api/me                       昵称/每日新词数/调度模式/目标词书（词书需段位解锁）；改新词上限当日立即生效（作废今日已物化计划）
 POST /api/placement/start           开始摸底
 POST /api/placement/answer          提交摸底作答 → 下一题或最终结果
 GET  /api/today                     今日队列（未物化则现算落库）

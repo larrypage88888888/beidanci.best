@@ -4,6 +4,7 @@ import type { ScheduleMode } from '@app/core';
 import { api } from '../lib/api';
 import { setSpeechAutoEnabled, speechAutoEnabled, speak } from '../lib/speech';
 import { useAuthStore } from '../stores/auth';
+import { useSessionStore } from '../stores/session';
 
 /** 设置页：调度模式切换（艾宾浩斯 ⇄ FSRS）、每日新词数、退出登录 */
 export default function SettingsPage() {
@@ -11,6 +12,7 @@ export default function SettingsPage() {
   const setUser = useAuthStore((s) => s.setUser);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const refreshToday = useSessionStore((s) => s.loadToday);
 
   const [saving, setSaving] = useState(false);
   const [savedTip, setSavedTip] = useState(false);
@@ -46,6 +48,8 @@ export default function SettingsPage() {
     try {
       const res = await api.updateMe(patchBody);
       setUser(res.user);
+      // 新词上限变化：立即按新上限重建今日队列（服务端已作废今日计划）
+      if (patchBody.dailyNewLimit !== undefined) void refreshToday();
       setSavedTip(true);
     } catch (err) {
       alert(err instanceof Error ? err.message : '保存失败');
