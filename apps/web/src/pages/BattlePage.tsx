@@ -143,6 +143,7 @@ export default function BattlePage() {
       setTimeout(() => {
         setAnim(null);
         setSelId(null);
+        setReveal(null); // 关键：切题时清掉上一题的 reveal，否则拼写题输入框被 !!reveal 禁用卡死
         setQ(r.next);
         setBusy(false); // 动画窗口内禁止重复提交同一题
       }, 850);
