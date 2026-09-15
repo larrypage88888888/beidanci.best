@@ -79,7 +79,13 @@ reviewsRoutes.post('/', async (c) => {
 
   const stmts: BatchItem<'sqlite'>[] = [];
 
+  // 同一批次内去重：同一词只处理首次（避免新词计数重复累加、重复日志、重复调度）
+  const seenInBatch = new Set<string>();
+
   for (const item of items) {
+    if (seenInBatch.has(item.wordId)) continue;
+    seenInBatch.add(item.wordId);
+
     const row = existingMap.get(item.wordId);
     const state: CardState = {
       wordId: item.wordId,

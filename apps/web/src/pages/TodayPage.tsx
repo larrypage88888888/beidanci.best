@@ -258,17 +258,23 @@ export default function TodayPage() {
 
       {!q && s.phase !== 'loading' && (
         <div className="rounded-2xl bg-white p-10 text-center shadow">
-          <p className="text-4xl">{s.error ? '😵' : '🌱'}</p>
-          <p className="mt-3 text-sm text-slate-500">{s.error ?? '今天的队列空空如也'}</p>
+          <p className="text-4xl">{s.phase === 'submitting' ? '💾' : s.error ? '😵' : '🌱'}</p>
+          <p className="mt-3 text-sm text-slate-500">
+            {s.phase === 'submitting'
+              ? '正在保存进度…（弱网自动重试中，请稍候）'
+              : s.error ?? '今天的队列空空如也'}
+          </p>
           {s.error?.includes('重新') && (
             <p className="mt-2 text-xs text-slate-300">即将自动返回登录页，重新注册即可继续</p>
           )}
-          <button
-            onClick={() => void s.loadToday()}
-            className="mt-4 rounded-lg bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600"
-          >
-            刷新试试
-          </button>
+          {s.phase !== 'submitting' && (
+            <button
+              onClick={() => void s.loadToday()}
+              className="mt-4 rounded-lg bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600"
+            >
+              刷新试试
+            </button>
+          )}
         </div>
       )}
 
