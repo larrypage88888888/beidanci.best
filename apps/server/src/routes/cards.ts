@@ -4,7 +4,7 @@ import type { AppEnv } from '../env';
 import { dailyPlans, dailyStats, userCards, userPoints, userWordStates } from '@app/db';
 import { DUPLICATE_POINTS, cardDrawAllowance, rollCardRarity } from '@app/core';
 import { requireAuth } from '../middleware/auth';
-import { dateKeyUtc, dayStartIso, nowIso } from '../lib/time';
+import { dateKeyCn, dayStartIso, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
 import { loadWordsByIds } from '../lib/wordQueries';
 
@@ -86,7 +86,7 @@ cardsRoutes.get('/collection', async (c) => {
   });
 
   const [pointsRow] = await db.select().from(userPoints).where(eq(userPoints.userId, userId)).limit(1);
-  const { draw } = await todayAllowance(db, userId, dateKeyUtc());
+  const { draw } = await todayAllowance(db, userId, dateKeyCn());
 
   return c.json({
     items,
@@ -100,7 +100,7 @@ cardsRoutes.get('/collection', async (c) => {
 cardsRoutes.post('/draw', async (c) => {
   const userId = c.get('userId');
   const db = getDb(c.env);
-  const date = dateKeyUtc();
+  const date = dateKeyCn();
 
   const { draw } = await todayAllowance(db, userId, date);
   if (draw.remaining <= 0) {

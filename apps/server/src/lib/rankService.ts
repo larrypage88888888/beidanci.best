@@ -10,7 +10,7 @@ import {
   shiftDateKey,
 } from '@app/core';
 import { dailyStats, userRankMeta, userSeasonRank, users } from '@app/db';
-import { dateKeyUtc, nowIso } from './time';
+import { dateKeyCn, nowIso } from './time';
 
 /**
  * C10 段位计算（设计文档 §10.3）：
@@ -25,7 +25,7 @@ export async function computeUserRank(
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) throw new Error('user_not_found');
 
-  const today = dateKeyUtc();
+  const today = dateKeyCn();
   const since = shiftDateKey(today, -6);
   const weekRows = await db
     .select({ totalCount: dailyStats.totalCount, correctCount: dailyStats.correctCount })

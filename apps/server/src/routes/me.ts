@@ -7,7 +7,7 @@ import { dailyPlans, dailyStats, userCards, userInventory, userPets, userPoints,
 import { PET_STAGES, cardDrawAllowance, computeStreak, migrateCardState } from '@app/core';
 import type { CardState } from '@app/core';
 import { publicUser } from './auth';
-import { dateKeyUtc, nowIso } from '../lib/time';
+import { dateKeyCn, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
 import { computeUserRank } from '../lib/rankService';
 import { requireAuth } from '../middleware/auth';
@@ -34,9 +34,9 @@ meRoutes.get('/', async (c) => {
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
 
-  // streak：取有学习记录的日期集合
+  // streak：取有学习记录的日期集合（传北京日期键，与 daily_stats 口径一致）
   const statRows = await db.select({ date: dailyStats.date }).from(dailyStats).where(eq(dailyStats.userId, userId));
-  const streak = computeStreak(statRows.map((r) => r.date));
+  const streak = computeStreak(statRows.map((r) => r.date), dateKeyCn());
 
   // 当前到期未毕业的词数（含未学新词之外的存量）
   const dueRow = await db.select({ n: sql<number>`count(*)` })
@@ -73,7 +73,7 @@ meRoutes.get('/', async (c) => {
   const [today] = await db
     .select()
     .from(dailyStats)
-    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, dateKeyUtc())))
+    .where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, dateKeyCn())))
     .limit(1);
   const cardDraw = cardDrawAllowance({
     answeredToday: today?.totalCount ?? 0,
@@ -204,7 +204,7 @@ meRoutes.patch('/', async (c) => {
   if (parsed.data.dailyNewLimit !== undefined && parsed.data.dailyNewLimit !== user.dailyNewLimit) {
     await db
       .delete(dailyPlans)
-      .where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.date, dateKeyUtc())));
+      .where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.date, dateKeyCn())));
   }
 
   const [updated] = await db

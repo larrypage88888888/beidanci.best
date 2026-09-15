@@ -4,7 +4,7 @@ import type { AppEnv } from '../env';
 import { dailyStats, userWordStates, users } from '@app/db';
 import { buildDailyQueue, computeStreak, hashSeed, remainingNewQuota } from '@app/core';
 import { requireAuth } from '../middleware/auth';
-import { dateKeyUtc, dayStartIso, nowIso } from '../lib/time';
+import { dateKeyCn, dayStartIso, nowIso } from '../lib/time';
 import { getOrBuildTodayPlan } from '../lib/todayBuilder';
 import { loadWordsByIds } from '../lib/wordQueries';
 import { ensureWordDifficulties } from '../lib/difficultyPipeline';
@@ -28,7 +28,7 @@ todayRoutes.use('*', requireAuth);
 
 todayRoutes.get('/', async (c) => {
   const userId = c.get('userId');
-  const date = dateKeyUtc();
+  const date = dateKeyCn();
   const mode = c.req.query('mode') === 'redo' ? 'redo' : 'normal';
   const db = getDb(c.env);
 
@@ -120,9 +120,9 @@ todayRoutes.get('/', async (c) => {
   });
   const reviewCount = items.filter((i) => i.entry === 'review').length;
 
-  // streak 与今日统计
+  // streak 与今日统计（today 用北京日期键，与 daily_stats 的日期口径一致）
   const statRows = await db.select({ date: dailyStats.date }).from(dailyStats).where(eq(dailyStats.userId, userId));
-  const streak = computeStreak(statRows.map((r) => r.date));
+  const streak = computeStreak(statRows.map((r) => r.date), dateKeyCn());
 
   return c.json({
     date,

@@ -34,7 +34,7 @@ import {
 } from '@app/core';
 import type { HandCard, WordMeta } from '@app/core';
 import { requireAuth } from '../middleware/auth';
-import { dateKeyUtc, nowIso } from '../lib/time';
+import { dateKeyCn, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
 import { loadWordsByIds } from '../lib/wordQueries';
 
@@ -194,7 +194,7 @@ async function buildHandCards(
 battleRoutes.get('/bosses', async (c) => {
   const userId = c.get('userId');
   const db = getDb(c.env);
-  const date = dateKeyUtc();
+  const date = dateKeyCn();
 
   const [bossRows, daily, stats] = await Promise.all([
     db.select().from(bossEvents).orderBy(asc(bossEvents.difficulty)),
@@ -235,7 +235,7 @@ const StartSchema = z.object({ bossId: z.string().min(1).max(40) });
 battleRoutes.post('/start', async (c) => {
   const userId = c.get('userId');
   const db = getDb(c.env);
-  const date = dateKeyUtc();
+  const date = dateKeyCn();
   const parsed = StartSchema.safeParse(await c.req.json().catch(() => ({})));
   if (!parsed.success) return c.json({ error: 'bad_request', message: '参数错误' }, 400);
 
@@ -388,7 +388,7 @@ battleRoutes.post('/abandon', async (c) => {
 battleRoutes.post('/answer', async (c) => {
   const userId = c.get('userId');
   const db = getDb(c.env);
-  const date = dateKeyUtc();
+  const date = dateKeyCn();
   const parsed = AnswerSchema.safeParse(await c.req.json().catch(() => ({})));
   if (!parsed.success) return c.json({ error: 'bad_request', message: '参数错误' }, 400);
 

@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/d1';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import type { D1Database } from '@cloudflare/workers-types';
 import { users } from '@app/db';
-import { dateKeyUtc } from '../lib/time';
+import { dateKeyCn } from '../lib/time';
 import { getOrBuildTodayPlan } from '../lib/todayBuilder';
 import { ensureWordDifficulties } from '../lib/difficultyPipeline';
 
@@ -18,7 +18,7 @@ export async function materializeAllPlans(dbRaw: D1Database): Promise<{ users: n
   const userRows = await db.select({ id: users.id }).from(users).limit(500);
   let built = 0;
 
-  const date = dateKeyUtc();
+  const date = dateKeyCn();
   for (const u of userRows) {
     try {
       const plan = await getOrBuildTodayPlan(db, u.id, date);

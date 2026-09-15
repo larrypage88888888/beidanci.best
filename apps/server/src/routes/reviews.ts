@@ -8,7 +8,7 @@ import { PET_STAGES, cardDrawAllowance, computeStreak, isRating, schedule, updat
 import type { CardState, Rating } from '@app/core';
 import { requireAuth } from '../middleware/auth';
 import { randomId } from '../lib/jwt';
-import { dateKeyUtc, nowIso } from '../lib/time';
+import { dateKeyCn, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
 
 /**
@@ -61,7 +61,7 @@ reviewsRoutes.post('/', async (c) => {
 
   const now = new Date();
   const nowStr = now.toISOString();
-  const date = dateKeyUtc(now);
+  const date = dateKeyCn(now);
 
   let newLearnedDelta = 0;
   let reviewedDelta = 0;
@@ -189,7 +189,7 @@ reviewsRoutes.post('/', async (c) => {
     .select({ date: dailyStats.date })
     .from(dailyStats)
     .where(eq(dailyStats.userId, userId));
-  const streak = computeStreak(statRows.map((r) => r.date));
+  const streak = computeStreak(statRows.map((r) => r.date), dateKeyCn());
 
   const unlockedBadges: string[] = [];
   if (reviewedDelta > 0) unlockedBadges.push('first_review');
