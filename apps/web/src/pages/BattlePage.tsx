@@ -83,10 +83,10 @@ export default function BattlePage() {
     }
   }
 
-  /** 中途退出：释放今日挑战次数，可重新挑战 */
+  /** 中途退出：直接结束本场（无限挑战，随时可重开） */
   async function abandon() {
     if (!battle || busy) return;
-    if (!window.confirm('退出本场战斗？今日挑战次数将释放，可重新挑战。')) return;
+    if (!window.confirm('退出本场战斗？随时可以重新挑战。')) return;
     setBusy(true);
     setNotice(null);
     try {
@@ -253,18 +253,17 @@ export default function BattlePage() {
         <h1 className="text-lg font-bold text-slate-800">⚔️ 卡牌对战</h1>
         {bosses && (
           <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600">
-            今日胜 {bosses.battleWinsToday}/3
+            今日首胜 {bosses.battleWinsToday}/3
           </span>
         )}
       </div>
       <p className="text-xs leading-relaxed text-slate-400">
         炉石式词灵对决：对手每回合打出一张词灵随从，你答题破解——答对召唤手牌词卡出招（连击增伤），答错被随从反击。
-        每天每个词灵可挑战一次，击败得词力积分 + 抽卡次数 + 限定随从卡。
+        <b className="text-slate-500">无限挑战！</b>每词灵每日首胜得词力积分 + 抽卡次数 + 限定随从卡，之后继续挑战仍得词力积分。
       </p>
 
       <div className="space-y-3">
         {bosses?.bosses.map((b) => {
-          const canFight = !b.playedToday;
           return (
             <div
               key={b.id}
@@ -291,23 +290,20 @@ export default function BattlePage() {
                 <span>💎 胜 +{b.rewardPoints} 词力</span>
               </div>
 
-              {b.wonToday ? (
-                <p className="mt-3 rounded-xl bg-emerald-50 py-2 text-center text-xs font-medium text-emerald-600">
-                  ✅ 今日已击败 · 明日再来
-                </p>
-              ) : canFight ? (
+              <div className="mt-3 flex items-center gap-2">
+                {b.wonToday && (
+                  <p className="min-w-0 flex-1 rounded-xl bg-emerald-50 py-2 text-center text-[11px] font-medium text-emerald-600">
+                    ✅ 首胜奖励已领
+                  </p>
+                )}
                 <button
                   onClick={() => void start(b)}
                   disabled={busy}
-                  className="mt-3 w-full rounded-xl bg-gradient-to-r from-red-500 to-rose-500 py-2.5 font-bold text-white transition hover:brightness-105 disabled:opacity-50"
+                  className={`${b.wonToday ? 'flex-1' : 'w-full'} rounded-xl bg-gradient-to-r from-red-500 to-rose-500 py-2.5 font-bold text-white transition hover:brightness-105 disabled:opacity-50`}
                 >
                   {busy ? '开战中…' : '⚔️ 挑战'}
                 </button>
-              ) : (
-                <p className="mt-3 rounded-xl bg-slate-50 py-2 text-center text-xs font-medium text-slate-400">
-                  今日已挑战 · 明天再来
-                </p>
-              )}
+              </div>
             </div>
           );
         })}

@@ -45,7 +45,8 @@ import { loadWordsByIds } from '../lib/wordQueries';
  * - 每回合对手打出一张词灵随从（= 当前题目词），你答题破解
  * - 答对 → 法力 +1，召唤手牌词卡随从攻击（伤害 = ATK + 连击加成）；答错 → 被随从反击（英雄扣威胁值）
  * - 手牌：开局从已收集词卡随机发 5 张（费用 SR1/SSR2/UR3，ATK 随难度，词根家族 +2）
- * - 服务端出题并权威判定；奖励：胜=积分+主题限定卡+抽卡次数，败=5 积分，每日每 BOSS 1 次
+ * - 服务端出题并权威判定；奖励：胜=积分（每次）+主题限定卡（每 BOSS 每日首胜），败=5 积分
+ * - 无限挑战：每日不限次数；限定卡与首胜抽卡资格仅首胜发放（防刷）
  * - 架构预留：mode 字段（pve | pvp），后续 PVP 复用同一套结算
  */
 export const battleRoutes = new Hono<AppEnv>();
@@ -204,7 +205,7 @@ battleRoutes.get('/bosses', async (c) => {
     db.select().from(dailyStats).where(and(eq(dailyStats.userId, userId), eq(dailyStats.date, date))).limit(1),
   ]);
 
-  const playedMap = new Map(daily.map((d) => [d.bossId, d.won > 0]));
+  const wonMap = new Map(daily.map((d) => [d.bossId, d.won > 0]));
   const bosses = bossRows.map((b) => ({
     id: b.id,
     name: b.name,
@@ -215,8 +216,9 @@ battleRoutes.get('/bosses', async (c) => {
     rewardPoints: b.rewardPoints,
     rewardRarity: b.rewardRarity,
     description: b.description,
-    playedToday: playedMap.has(b.id),
-    wonToday: playedMap.get(b.id) ?? false,
+    // 无限挑战：始终可打；wonToday = 今日首胜奖励已领（限定卡/抽卡资格）
+    playedToday: false,
+    wonToday: wonMap.get(b.id) ?? false,
   }));
 
   return c.json({
@@ -239,15 +241,6 @@ battleRoutes.post('/start', async (c) => {
 
   const [boss] = await db.select().from(bossEvents).where(eq(bossEvents.id, parsed.data.bossId)).limit(1);
   if (!boss) return c.json({ error: 'not_found', message: 'BOSS 不存在' }, 404);
-
-  const [played] = await db
-    .select()
-    .from(userBossDaily)
-    .where(and(eq(userBossDaily.userId, userId), eq(userBossDaily.bossId, boss.id), eq(userBossDaily.date, date)))
-    .limit(1);
-  if (played) {
-    return c.json({ error: 'battle_done', message: `今天已经挑战过「${boss.name}」了，明天再来吧` }, 409);
-  }
 
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   const nowIsoStr = nowIso();
@@ -340,12 +333,6 @@ battleRoutes.post('/start', async (c) => {
     .values({ userId, bossId: boss.id, status: 'pending', stateJson: JSON.stringify(state), startedAt: nowIsoStr })
     .returning();
 
-  // 占坑每日挑战（中途放弃也消耗今日次数）
-  await db
-    .insert(userBossDaily)
-    .values({ userId, bossId: boss.id, date, won: 0 })
-    .onConflictDoNothing();
-
   return c.json({
     battleId: inserted.id,
     boss: { id: boss.id, name: boss.name, emoji: boss.emoji, difficulty: boss.difficulty, hp: boss.hp, rewardRarity: boss.rewardRarity },
@@ -372,7 +359,7 @@ const AnswerSchema = z.object({
 
 const AbandonSchema = z.object({ battleId: z.number().int().positive() });
 
-// POST /api/battle/abandon —— 中途退出：释放今日挑战次数（可重新挑战），不结算奖励
+// POST /api/battle/abandon —— 中途退出：直接结束本场（无限挑战，无次数占用，随时可重开）
 battleRoutes.post('/abandon', async (c) => {
   const userId = c.get('userId');
   const db = getDb(c.env);
@@ -393,10 +380,6 @@ battleRoutes.post('/abandon', async (c) => {
     .update(userBattles)
     .set({ status: 'abandoned', finishedAt: nowIso() })
     .where(and(eq(userBattles.id, battle.id), eq(userBattles.userId, userId)));
-  // 释放今日占坑（start 时写入的 user_boss_daily）→ 可重新挑战
-  await db
-    .delete(userBossDaily)
-    .where(and(eq(userBossDaily.userId, userId), eq(userBossDaily.bossId, battle.bossId), eq(userBossDaily.date, dateKeyUtc())));
 
   return c.json({ ok: true });
 });
@@ -489,16 +472,23 @@ battleRoutes.post('/answer', async (c) => {
     });
   }
 
-  // ── 结算（奖励与每日限制与既有规则一致）──
+  // ── 结算（无限挑战：每次胜利都得词力积分；限定随从卡 + 首胜抽卡资格仅「每日首胜」发放）──
   const win = outcome === 'win';
   const [boss] = await db.select().from(bossEvents).where(eq(bossEvents.id, battle.bossId)).limit(1);
+  const [bossDaily] = await db
+    .select()
+    .from(userBossDaily)
+    .where(and(eq(userBossDaily.userId, userId), eq(userBossDaily.bossId, battle.bossId), eq(userBossDaily.date, date)))
+    .limit(1);
+  const firstWinToday = win && !bossDaily;
+
   let rewardPoints = win ? (boss?.rewardPoints ?? 30) : 5;
   let rewardWordId: string | null = null;
   let rewardRarity: string | null = null;
   let duplicate = false;
   let pointsGained = 0;
 
-  if (win) {
+  if (firstWinToday) {
     const pool = boss ? await themePool(db, boss.theme) : [];
     if (pool.length > 0) {
       rewardWordId = pool[Math.floor(Math.random() * pool.length)];
@@ -518,6 +508,11 @@ battleRoutes.post('/answer', async (c) => {
         await db.insert(userCards).values({ userId, wordId: rewardWordId, rarity: rewardRarity, obtainedAt: nowIso() });
       }
     }
+    // 记录今日首胜（限定卡已领；battleWins 抽卡资格也只计首胜，防止无限刷）
+    await db
+      .insert(userBossDaily)
+      .values({ userId, bossId: battle.bossId, date, won: 1 })
+      .onConflictDoNothing();
   }
 
   await db
@@ -528,7 +523,7 @@ battleRoutes.post('/answer', async (c) => {
       set: { balance: sql`${userPoints.balance} + ${rewardPoints}` },
     });
 
-  // 今日统计：作答计入活动（浇水/抽卡门槛/连续打卡），胜利 + 抽卡资格
+  // 今日统计：作答计入活动（浇水/抽卡门槛/连续打卡），每日首胜 + 抽卡资格
   await db
     .insert(dailyStats)
     .values({
@@ -537,7 +532,7 @@ battleRoutes.post('/answer', async (c) => {
       reviewed: state.idx,
       totalCount: state.idx,
       correctCount: state.correct,
-      battleWins: win ? 1 : 0,
+      battleWins: firstWinToday ? 1 : 0,
     })
     .onConflictDoUpdate({
       target: [dailyStats.userId, dailyStats.date],
@@ -545,14 +540,9 @@ battleRoutes.post('/answer', async (c) => {
         reviewed: sql`${dailyStats.reviewed} + ${state.idx}`,
         totalCount: sql`${dailyStats.totalCount} + ${state.idx}`,
         correctCount: sql`${dailyStats.correctCount} + ${state.correct}`,
-        battleWins: sql`${dailyStats.battleWins} + ${win ? 1 : 0}`,
+        battleWins: sql`${dailyStats.battleWins} + ${firstWinToday ? 1 : 0}`,
       },
     });
-
-  await db
-    .update(userBossDaily)
-    .set({ won: win ? 1 : 0 })
-    .where(and(eq(userBossDaily.userId, userId), eq(userBossDaily.bossId, battle.bossId), eq(userBossDaily.date, date)));
 
   await db
     .update(userBattles)
