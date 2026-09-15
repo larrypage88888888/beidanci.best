@@ -60,7 +60,7 @@ export {
 
 // 每日组单
 export type { DailyQueueInput, DailyQueue } from './dailyQueue';
-export { mulberry32, shuffleSeeded, buildDailyQueue, remainingNewQuota } from './dailyQueue';
+export { mulberry32, shuffleSeeded, buildDailyQueue, remainingNewQuota, pickByInitials } from './dailyQueue';
 
 // streak 打卡
 export { todayKey, toDateKey, computeStreak, longestStreak } from './streak';

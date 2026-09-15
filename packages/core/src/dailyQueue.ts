@@ -88,6 +88,41 @@ export function buildDailyQueue(input: DailyQueueInput): DailyQueue {
   return { newWordIds: fresh, reviewWordIds: reviews, order };
 }
 
+/**
+ * 按首字母分桶轮转取词：让同一天的 N 个新词首字母尽量分散。
+ *
+ * 背景：候选池 SQL 按难度筛选后，若直接取前 N 个，同难度档内按字母序
+ * （或词库本身 a/c 打头词占比高）会导致当天新词形近词扎堆、容易记混。
+ * 这里先把候选按首字母分桶、桶内与桶序都洗牌（确定性 rng），
+ * 再轮转从不同桶各取一个，直到取够 N 个。
+ */
+export function pickByInitials(wordIds: readonly string[], n: number, rng: () => number): string[] {
+  const buckets = new Map<string, string[]>();
+  for (const id of wordIds) {
+    const ch = id.charAt(0).toLowerCase() || '?';
+    const arr = buckets.get(ch);
+    if (arr) arr.push(id);
+    else buckets.set(ch, [id]);
+  }
+  // 桶序洗牌 + 桶内洗牌（同一种子下结果确定，保证同一天重复拉取一致）
+  const shuffled = shuffleSeeded([...buckets.values()], rng).map((b) => shuffleSeeded(b, rng));
+  const picked: string[] = [];
+  let head = 0;
+  while (picked.length < n) {
+    let added = false;
+    for (let k = 0; k < shuffled.length && picked.length < n; k++) {
+      const bucket = shuffled[(head + k) % shuffled.length];
+      if (bucket.length > 0) {
+        picked.push(bucket.shift() as string);
+        added = true;
+      }
+    }
+    if (!added) break; // 所有桶耗尽
+    head += 1;
+  }
+  return picked;
+}
+
 /** 今天还剩多少新词条额（供 /api/today 展示） */
 export function remainingNewQuota(newLimit: number, alreadyLearnedToday: number): number {
   return Math.max(0, newLimit - alreadyLearnedToday);

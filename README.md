@@ -71,6 +71,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/e2e-settings.mjs [origin]` | 设置：每日新词上限修改当日立即生效（默认 10 → 5 → 30 → 10，10 步） |
 | `node scripts/e2e-redo.mjs [origin]` | 重做今日单词：完成后可再次进入做题（今日已学词转复习队列，12 步） |
 | `node scripts/e2e-bughunt.mjs [origin]` | 深度 Bug Hunt（本地，需 DEV_MODE）：快闪复习→毕业循环/降级恢复/词苗同日计龄/FSRS 切换/边界输入/重复词提交计数（26 步） |
+| `node scripts/check-new-word-dist.mjs [origin]` | 新词首字母分布检查：连续注册 5 用户拉取今日新词，验证首字母分散（修复 a 打头扎堆） |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设

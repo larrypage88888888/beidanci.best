@@ -1,7 +1,7 @@
-import { and, eq, gte, isNull, like, lte, ne, notInArray, or, sql } from 'drizzle-orm';
+import { and, asc, eq, gte, isNull, like, lte, ne, notInArray, or } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { dailyPlans, users, userWordStates, words } from '@app/db';
-import { buildDailyQueue, hashSeed, levelBand } from '@app/core';
+import { buildDailyQueue, hashSeed, levelBand, mulberry32, pickByInitials } from '@app/core';
 import { nowIso } from './time';
 
 /**
@@ -66,6 +66,8 @@ export async function getOrBuildTodayPlan(
     .where(eq(userWordStates.userId, userId));
   const band = levelBand(user.level, 12);
 
+  // 候选池取整个难度带（上限 500 保护），不按字母物理序截断——
+  // 排序/取前 N 交给下方确定性洗牌，避免每天都是 a/b 打头的词
   let candidateRows = await db
     .select({ id: words.id })
     .from(words)
@@ -77,8 +79,8 @@ export async function getOrBuildTodayPlan(
         notInArray(words.id, learnedSub),
       ),
     )
-    .orderBy(sql`abs(${words.difficulty} - ${user.level})`)
-    .limit(Math.max(user.dailyNewLimit * 3, 20));
+    .orderBy(asc(words.id))
+    .limit(500);
 
   // 候选不足时放宽难度窗口
   if (candidateRows.length < user.dailyNewLimit) {
@@ -86,15 +88,24 @@ export async function getOrBuildTodayPlan(
       .select({ id: words.id })
       .from(words)
       .where(and(like(words.tagsJson, `%"${bookTag}"%`), notInArray(words.id, learnedSub)))
-      .orderBy(sql`abs(${words.difficulty} - ${user.level})`)
-      .limit(Math.max(user.dailyNewLimit * 3, 20));
+      .orderBy(asc(words.id))
+      .limit(500);
   }
 
   // 5) 组单（种子确定性：同用户同日重复拉取一致）
+  // 新词按首字母分桶轮转取（确定性洗牌），避免形近词扎堆记混；
+  // SQL 层不按字母物理序截断，候选池取整个难度带
+  const rng = mulberry32(hashSeed(`${userId}:${dateKey}:pool`));
+  const diverse = pickByInitials(
+    candidateRows.map((r) => r.id),
+    Math.min(user.dailyNewLimit, candidateRows.length),
+    rng,
+  );
+
   const queue = buildDailyQueue({
-    candidateNewWordIds: candidateRows.map((r) => r.id),
+    candidateNewWordIds: diverse,
     dueReviewWordIds: dueRows.map((r) => r.wordId),
-    newLimit: user.dailyNewLimit,
+    newLimit: diverse.length,
     seed: hashSeed(`${userId}:${dateKey}`),
   });
 
