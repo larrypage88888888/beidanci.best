@@ -94,16 +94,16 @@ export default function SettingsPage() {
         </div>
         <input
           type="range"
-          min={5}
+          min={2}
           max={50}
-          step={5}
+          step={1}
           defaultValue={user?.dailyNewLimit ?? 10}
           onMouseUp={(e) => patch({ dailyNewLimit: Number((e.target as HTMLInputElement).value) })}
           onTouchEnd={(e) => patch({ dailyNewLimit: Number((e.target as HTMLInputElement).value) })}
           className="mt-4 w-full accent-blue-600"
         />
         <p className="mt-1 flex justify-between text-[10px] text-slate-300">
-          <span>5</span>
+          <span>2</span>
           <span>50</span>
         </p>
       </section>
