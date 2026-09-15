@@ -99,7 +99,7 @@ export const api = {
   battleBosses: () => request<BossesResponse>('/api/battle/bosses'),
   battleStart: (bossId: string) =>
     request<BattleStartResponse>('/api/battle/start', { method: 'POST', body: JSON.stringify({ bossId }) }),
-  battleAnswer: (battleId: number, ans: { picked?: string; typed?: string }) =>
+  battleAnswer: (battleId: number, ans: { picked?: string; typed?: string; cardId?: string }) =>
     request<BattleAnswerResponse>('/api/battle/answer', {
       method: 'POST',
       body: JSON.stringify({ battleId, ...ans }),

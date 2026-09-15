@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>词流 · 卡牌对战原型 v1</title>
+<style>
+  :root {
+    --bg1: #0b1220;
+    --bg2: #1a1b3a;
+    --card: #1e2a45;
+    --card2: #26345a;
+    --line: rgba(148, 163, 184, 0.18);
+    --txt: #e2e8f0;
+    --sub: #94a3b8;
+    --blue: #60a5fa;
+    --green: #34d399;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --gold: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+    --sr: linear-gradient(135deg, #3b82f6, #60a5fa);
+    --ssr: linear-gradient(135deg, #a855f7, #d946ef);
+    --ur: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(120% 90% at 50% 0%, var(--bg2) 0%, var(--bg1) 70%);
+    color: var(--txt);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 50% 0%, #1a1b3a 0%, #0b1220 70%);
+  }
+  .page { display: none; padding: 16px 16px 90px; }
+  .page.active { display: block; animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+
+  /* ── 顶栏 ── */
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .topbar h1 { font-size: 19px; font-weight: 800; letter-spacing: .5px; }
+  .topbar .badge { font-size: 11px; font-weight: 700; color: var(--amber); background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.3); border-radius: 999px; padding: 3px 10px; }
+  .sub { font-size: 12px; color: var(--sub); line-height: 1.6; }
+
+  /* ── 卡片通用 ── */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+  .grad-btn { border: none; border-radius: 12px; padding: 12px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; }
+
+  /* ── 主页：我的卡组 ── */
+  .mydeck { padding: 14px; margin-bottom: 14px; background: linear-gradient(135deg, #233a6b, #1a2450); border: 1px solid var(--line); border-radius: 16px; display: flex; align-items: center; gap: 12px; }
+  .mydeck .icon { font-size: 30px; }
+  .mydeck .name { font-size: 15px; font-weight: 800; }
+  .mydeck .meta { font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .mydeck .power { margin-left: auto; text-align: right; }
+  .mydeck .power b { font-size: 18px; color: var(--amber); }
+  .mydeck .power span { display: block; font-size: 10px; color: var(--sub); }
+
+  .section-title { font-size: 13px; font-weight: 700; color: var(--sub); margin: 16px 0 8px; letter-spacing: 1px; }
+
+  .boss { padding: 14px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; position: relative; }
+  .boss .avatar { font-size: 34px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.06); border-radius: 14px; }
+  .boss .info { flex: 1; min-width: 0; }
+  .boss .name { font-size: 15px; font-weight: 800; }
+  .boss .stars { font-size: 10px; color: var(--amber); letter-spacing: 1px; }
+  .boss .desc { font-size: 11px; color: var(--sub); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .boss .stats { display: flex; gap: 10px; margin-top: 6px; font-size: 11px; color: var(--sub); }
+  .boss .stats b { color: var(--txt); }
+  .boss .rarity-tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; color: #fff; }
+  .boss .go { margin-left: auto; border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; }
+  .boss.done .go { background: #334155; color: var(--sub); }
+  .boss .done-tag { position: absolute; right: 12px; bottom: 10px; font-size: 10px; color: var(--green); }
+
+  .legend { display: flex; gap: 8px; margin-top: 14px; }
+  .legend span { flex: 1; text-align: center; font-size: 10px; color: var(--sub); background: rgba(255,255,255,.04); border-radius: 10px; padding: 8px 4px; }
+
+  /* ── 底部导航 ── */
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; background: rgba(11,18,32,.92); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 6px 0 14px; }
+  .tabbar .tab { flex: 1; text-align: center; font-size: 10px; color: var(--sub); padding: 4px 0; cursor: pointer; }
+  .tabbar .tab .ic { font-size: 18px; display: block; margin-bottom: 2px; }
+  .tabbar .tab.on { color: var(--blue); }
+
+  /* ── 卡组页 ── */
+  .deckgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .wcard { border-radius: 14px; padding: 10px 8px; text-align: center; position: relative; background: var(--card); border: 1.5px solid var(--line); overflow: hidden; }
+  .wcard.sr { border-color: #3b82f6; box-shadow: 0 0 14px rgba(59,130,246,.25); }
+  .wcard.ssr { border-color: #a855f7; box-shadow: 0 0 16px rgba(168,85,247,.3); }
+  .wcard.ur { border-color: #f59e0b; box-shadow: 0 0 20px rgba(251,191,36,.4); }
+  .wcard .top { display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; color: var(--sub); }
+  .wcard .word { font-size: 14px; font-weight: 800; margin: 6px 0 2px; }
+  .wcard .phon { font-size: 9px; color: var(--sub); }
+  .wcard .atk { margin-top: 6px; font-size: 10px; display: flex; justify-content: space-between; color: var(--sub); }
+  .wcard .atk b { font-size: 11px; }
+  .wcard .atk b.a { color: var(--red); }
+  .wcard .atk b.d { color: var(--blue); }
+
+  /* ── 卡牌详情弹层 ── */
+  .overlay { position: absolute; inset: 0; background: rgba(4,8,18,.82); display: none; align-items: center; justify-content: center; z-index: 20; }
+  .overlay.show { display: flex; }
+  .bigcard { width: 240px; border-radius: 18px; padding: 18px 16px; text-align: center; background: linear-gradient(160deg, #1e2a45, #0f172a); border: 2px solid; position: relative; }
+  .bigcard.ur { border-color: #f59e0b; box-shadow: 0 0 40px rgba(251,191,36,.5); }
+  .bigcard.ssr { border-color: #a855f7; box-shadow: 0 0 40px rgba(168,85,247,.45); }
+  .bigcard .r { font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+  .bigcard .word { font-size: 26px; font-weight: 900; margin-top: 8px; }
+  .bigcard .phon { font-size: 12px; color: var(--sub); margin-top: 3px; }
+  .bigcard .def { font-size: 12px; color: var(--txt); margin-top: 10px; line-height: 1.5; }
+  .bigcard .skill { margin-top: 12px; border-radius: 10px; background: rgba(255,255,255,.06); padding: 8px; font-size: 11px; color: var(--sub); }
+  .bigcard .skill b { color: var(--amber); }
+  .bigcard .stats { display: flex; gap: 10px; margin-top: 12px; }
+  .bigcard .stats > div { flex: 1; border-radius: 10px; background: rgba(255,255,255,.06); padding: 8px 0; }
+  .bigcard .stats b { font-size: 18px; display: block; }
+  .bigcard .stats span { font-size: 10px; color: var(--sub); }
+  .bigcard .close { margin-top: 14px; width: 100%; border: none; border-radius: 10px; background: #334155; color: #fff; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+  /* ── 对战页 ── */
+  .arena { display: flex; flex-direction: column; gap: 10px; }
+  .hpbar { display: flex; align-items: center; gap: 8px; }
+  .hpbar .who { font-size: 11px; font-weight: 700; width: 60px; }
+  .hpbar .track { flex: 1; height: 10px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .hpbar .fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+  .hpbar .hp { font-size: 11px; font-weight: 800; width: 34px; text-align: right; }
+
+  .opponent { text-align: center; padding: 12px; }
+  .opponent .avatar { font-size: 44px; }
+  .opponent .name { font-size: 13px; font-weight: 800; margin-top: 2px; }
+  /* 对手打出的卡 */
+  .field { display: flex; justify-content: center; margin: 12px 0 4px; }
+  .field-card { width: 150px; border-radius: 14px; padding: 12px 10px; text-align: center; background: linear-gradient(160deg, #312e81, #1e1b4b); border: 2px solid #6366f1; box-shadow: 0 10px 30px rgba(99,102,241,.35); position: relative; animation: cardIn .4s ease; }
+  .field-card.opp { transform: translateY(-4px); }
+  .field-card .tag { font-size: 9px; color: #a5b4fc; letter-spacing: 1px; }
+  .field-card .word { font-size: 22px; font-weight: 900; margin-top: 6px; }
+  .field-card .phon { font-size: 10px; color: #a5b4fc; margin-top: 2px; }
+  .field-card .def { font-size: 11px; color: #c7d2fe; margin-top: 8px; line-height: 1.4; min-height: 32px; }
+  .field-card .atk { margin-top: 8px; font-size: 11px; color: #fca5a5; font-weight: 800; }
+  .field-card.shake { animation: shake .5s ease; }
+  .field-card.broken { animation: broken .5s ease forwards; }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(-14px) scale(.9);} to { opacity: 1; transform: none;} }
+  @keyframes shake { 0%,100% { transform: translateX(0);} 20% { transform: translateX(-8px);} 40% { transform: translateX(8px);} 60% { transform: translateX(-5px);} 80% { transform: translateX(5px);} }
+  @keyframes broken { 0% { transform: rotate(0);} 100% { transform: rotate(-12deg) translateY(20px); opacity: 0;} }
+  @keyframes dmgFloat { 0% { opacity: 0; transform: translateY(6px) scale(.6);} 30% { opacity: 1; transform: translateY(0) scale(1.25);} 100% { opacity: 0; transform: translateY(-22px) scale(1);} }
+  .dmg-num { position: absolute; top: -14px; right: 6px; font-size: 22px; font-weight: 900; color: #fca5a5; animation: dmgFloat .9s ease forwards; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+
+  .vs { text-align: center; font-size: 11px; color: var(--sub); letter-spacing: 4px; margin: 2px 0; }
+
+  /* 题目卡 */
+  .question { border-radius: 16px; background: var(--card); border: 1px solid var(--line); padding: 14px; }
+  .question .qtype { font-size: 10px; color: var(--blue); letter-spacing: 2px; }
+  .question .qword { font-size: 26px; font-weight: 900; text-align: center; margin: 8px 0 2px; }
+  .question .qphon { text-align: center; font-size: 12px; color: var(--sub); margin-bottom: 8px; }
+  .question .opts { display: grid; gap: 8px; margin-top: 10px; }
+  .question .opt { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 12px; padding: 11px 12px; font-size: 13px; color: var(--txt); text-align: left; cursor: pointer; }
+  .question .opt .k { color: var(--sub); font-weight: 800; margin-right: 8px; }
+  .question .opt.sel { border-color: var(--blue); background: rgba(96,165,250,.15); }
+  .question .opt.ok { border-color: var(--green); background: rgba(52,211,153,.15); }
+  .question .opt.no { border-color: var(--red); background: rgba(248,113,113,.15); }
+  .question .spell-row { display: flex; gap: 8px; margin-top: 10px; }
+  .question .spell-row input { flex: 1; background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; color: var(--txt); font-size: 15px; outline: none; }
+  .question .spell-row button { border: none; border-radius: 12px; background: var(--blue); color: #fff; font-weight: 800; padding: 0 16px; font-size: 14px; cursor: pointer; }
+
+  /* 连击 */
+  .combo { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--amber); }
+
+  /* 手牌 */
+  .hand { display: flex; gap: 6px; margin-top: 10px; }
+  .hand .hcard { flex: 1; border-radius: 10px; padding: 8px 4px; text-align: center; background: var(--card); border: 1.5px solid var(--line); font-size: 10px; cursor: pointer; position: relative; transition: transform .15s ease; }
+  .hand .hcard.sel { transform: translateY(-8px); border-color: var(--amber); box-shadow: 0 6px 18px rgba(251,191,36,.3); }
+  .hand .hcard .w { font-size: 11px; font-weight: 800; }
+  .hand .hcard .at { font-size: 9px; color: var(--red); font-weight: 800; }
+  .hand .hcard .df { font-size: 9px; color: var(--blue); font-weight: 800; }
+  .hand .hcard .r { position: absolute; top: 3px; right: 4px; font-size: 8px; font-weight: 900; }
+  .hand .hcard.sr { border-color: #3b82f6; } .hand .hcard.ssr { border-color: #a855f7; } .hand .hcard.ur { border-color: #f59e0b; }
+
+  .battle-hint { text-align: center; font-size: 11px; color: var(--sub); margin-top: 10px; }
+  .demo-btn { width: 100%; margin-top: 8px; border: none; border-radius: 12px; background: var(--amber); color: #1e1b4b; font-weight: 800; padding: 11px; font-size: 13px; cursor: pointer; }
+
+  /* ── 结算页 ── */
+  .result { text-align: center; padding-top: 20px; }
+  .result .trophy { font-size: 60px; animation: bounce 1s ease infinite; }
+  @keyframes bounce { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-10px);} }
+  .result h2 { font-size: 22px; font-weight: 900; margin-top: 6px; }
+  .result .sub { margin-top: 4px; }
+  .reward { margin: 16px 0; border-radius: 16px; background: var(--card); border: 1px solid var(--line); padding: 4px 14px; }
+  .reward .row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .reward .row:last-child { border-bottom: none; }
+  .reward .row b { font-size: 15px; }
+  .drop { display: flex; justify-content: center; margin: 18px 0 6px; }
+  .drop .drawn { width: 170px; border-radius: 16px; padding: 16px; text-align: center; border: 2px solid #f59e0b; background: linear-gradient(160deg, #3b2d0f, #1a1305); box-shadow: 0 0 44px rgba(251,191,36,.55); animation: flipIn .7s ease; }
+  @keyframes flipIn { from { opacity: 0; transform: rotateY(90deg) scale(.8);} to { opacity: 1; transform: none;} }
+  .drop .drawn .r { font-size: 10px; font-weight: 900; letter-spacing: 3px; color: var(--amber); }
+  .drop .drawn .word { font-size: 24px; font-weight: 900; margin-top: 8px; }
+  .drop .drawn .def { font-size: 11px; color: var(--sub); margin-top: 6px; }
+  .result .btns { display: flex; gap: 10px; margin-top: 18px; }
+  .result .btns button { flex: 1; border: none; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; }
+  .result .btns .ghost { background: #1e293b; color: var(--sub); }
+  .result .btns .primary { background: var(--blue); color: #fff; }
+  .win-tag { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 800; color: var(--green); background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.3); border-radius: 999px; padding: 4px 12px; }
+
+  /* 演示提示 */
+  .demo-note { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 50; font-size: 10px; color: #0b1220; background: rgba(251,191,36,.9); border-radius: 999px; padding: 3px 12px; font-weight: 700; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+  <!-- ══════════ 页面 1：对战主页（对手选择） ══════════ -->
+  <div class="page" id="page-home">
+    <div class="topbar">
+      <h1>⚔️ 卡牌对战</h1>
+      <span class="badge">今日 1/3 胜</span>
+    </div>
+
+    <div class="mydeck" onclick="openDeck()">
+      <span class="icon">📚</span>
+      <div>
+        <div class="name">我的词卡组</div>
+        <div class="meta">已收集 <b style="color:var(--txt)">45</b> 张 · 词根家族 <b style="color:var(--txt)">5</b>/15</div>
+      </div>
+      <div class="power">
+        <b>1,280</b>
+        <span>卡组战力</span>
+      </div>
+    </div>
+
+    <div class="section-title">挑战词灵 · 每日每 BOSS 限 1 次</div>
+
+    <div class="card boss" onclick="startBattle('root')">
+      <div class="avatar">🧙</div>
+      <div class="info">
+        <div class="name">词根长老 <span class="stars">⭐</span></div>
+        <div class="desc">镇守词根家族图鉴，答对出招破其卡牌</div>
+        <div class="stats"><span>❤️ <b>12</b></span><span>💎 胜 +<b>30</b></span></div>
+      </div>
+      <span class="rarity-tag" style="background:var(--ur)">UR</span>
+      <button class="go" style="background:var(--red)" onclick="event.stopPropagation();startBattle('root')">⚔️ 挑战</button>
+    </div>
+
+    <div class="card boss">
+      <div class="avatar">👹</div>
+      <div class="info">
+        <div class="name">拼写魔王 <span class="stars">⭐⭐</span></div>
+        <div class="desc">长词拼写的地狱试炼</div>
+        <div class="stats"><span>❤️ <b>14</b></span><span>💎 胜 +<b>40</b></span></div>
+      </div>
+      <span class="rarity-tag" style="background:var(--ssr)">SSR</span>
+      <button class="go" style="background:var(--red)" onclick="startBattle('spell')">⚔️ 挑战</button>
+    </div>
+
+    <div class="card boss done">
+      <div class="avatar">🐲</div>
+      <div class="info">
+        <div class="name">词汇暴君 <span class="stars">⭐⭐⭐</span></div>
+        <div class="desc">高频词的终极考验</div>
+        <div class="stats"><span>❤️ <b>16</b></span><span>💎 胜 +<b>50</b></span></div>
+      </div>
+      <span class="rarity-tag" style="background:var(--ur)">UR</span>
+      <button class="go" disabled style="background:#334155">明日再来</button>
+      <span class="done-tag">✅ 今日已击败</span>
+    </div>
+
+    <div class="section-title">玩法说明</div>
+    <div class="legend">
+      <span>🃏 对手出牌 → 你答题破牌</span>
+      <span>⚔️ 答对用手牌反击</span>
+      <span>💥 连击增伤 · 错答挨打</span>
+    </div>
+  </div>
+
+  <!-- ══════════ 页面 2：卡组 ══════════ -->
+  <div class="page" id="page-deck">
+    <div class="topbar">
+      <h1>📚 我的词卡</h1>
+      <span class="badge" onclick="goHome()" style="cursor:pointer">← 返回</span>
+    </div>
+    <p class="sub">每学一个词就获得一张词卡：难度越高 ATK 越高，词根家族卡触发技能加成。</p>
+
+    <div class="section-title">UR 传说</div>
+    <div class="deckgrid">
+      <div class="wcard ur" onclick="openCard(0)">
+        <div class="top"><span>UR</span><span>🐲</span></div>
+        <div class="word">inevitable</div>
+        <div class="phon">/ɪnˈevɪtəbl/</div>
+        <div class="atk"><span>⚔️ <b class="a">88</b></span><span>🛡️ <b class="d">64</b></span></div>
+      </div>
+      <div class="wcard ur" onclick="openCard(1)">
+        <div class="top"><span>UR</span><span>🧬</span></div>
+        <div class="word">biology</div>
+        <div class="phon">/baɪˈɒlədʒi/</div>
+        <div class="atk"><span>⚔️ <b class="a">76</b></span><span>🛡️ <b class="d">70</b></span></div>
+      </div>
+    </div>
+
+    <div class="section-title">SSR 史诗</div>
+    <div class="deckgrid">
+      <div class="wcard ssr" onclick="openCard(2)">
+        <div class="top"><span>SSR</span><span>👀</span></div>
+        <div class="word">contradict</div>
+        <div class="phon">/ˌkɒntrəˈdɪkt/</div>
+        <div class="atk"><span>⚔️ <b class="a">72</b></span><span>🛡️ <b class="d">58</b></span></div>
+      </div>
+      <div class="wcard ssr" onclick="openCard(3)">
+        <div class="top"><span>SSR</span><span>🌍</span></div>
+        <div class="word">geography</div>
+        <div class="phon">/dʒiˈɒɡrəfi/</div>
+        <div class="atk"><span>⚔️ <b class="a">64</b></span><span>🛡️ <b class="d">62</b></span></div>
+      </div>
+      <div class="wcard ssr" onclick="openCard(4)">
+        <div class="top"><span>SSR</span><span>🎯</span></div>
+        <div class="word">project</div>
+        <div class="phon">/ˈprɒdʒekt/</div>
+        <div class="atk"><span>⚔️ <b class="a">68</b></span><span>🛡️ <b class="d">55</b></span></div>
+      </div>
+      <div class="wcard ssr" onclick="openCard(5)">
+        <div class="top"><span>SSR</span><span>💬</span></div>
+        <div class="word">predict</div>
+        <div class="phon">/prɪˈdɪkt/</div>
+        <div class="atk"><span>⚔️ <b class="a">70</b></span><span>🛡️ <b class="d">50</b></span></div>
+      </div>
+    </div>
+
+    <div class="section-title">SR 稀有</div>
+    <div class="deckgrid">
+      <div class="wcard sr" onclick="openCard(6)">
+        <div class="top"><span>SR</span><span>📖</span></div>
+        <div class="word">ability</div>
+        <div class="phon">/əˈbɪləti/</div>
+        <div class="atk"><span>⚔️ <b class="a">42</b></span><span>🛡️ <b class="d">48</b></span></div>
+      </div>
+      <div class="wcard sr" onclick="openCard(7)">
+        <div class="top"><span>SR</span><span>📖</span></div>
+        <div class="word">accept</div>
+        <div class="phon">/əkˈsept/</div>
+        <div class="atk"><span>⚔️ <b class="a">38</b></span><span>🛡️ <b class="d">52</b></span></div>
+      </div>
+      <div class="wcard sr" onclick="openCard(8)">
+        <div class="top"><span>SR</span><span>📖</span></div>
+        <div class="word">announce</div>
+        <div class="phon">/əˈnaʊns/</div>
+        <div class="atk"><span>⚔️ <b class="a">40</b></span><span>🛡️ <b class="d">44</b></span></div>
+      </div>
+      <div class="wcard sr" onclick="openCard(9)">
+        <div class="top"><span>SR</span><span>📖</span></div>
+        <div class="word">benefit</div>
+        <div class="phon">/ˈbenɪfɪt/</div>
+        <div class="atk"><span>⚔️ <b class="a">36</b></span><span>🛡️ <b class="d">50</b></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ 页面 3：对战 ══════════ -->
+  <div class="page" id="page-battle">
+    <div class="topbar">
+      <h1>⚔️ 词根长老</h1>
+      <span class="combo">🔥 连击 <b id="combo-num">3</b></span>
+    </div>
+
+    <div class="arena">
+      <!-- 对手 -->
+      <div class="hpbar">
+        <span class="who">🧙 长老</span>
+        <div class="track"><div class="fill" id="boss-hp" style="width:42%;background:linear-gradient(90deg,#ef4444,#f87171)"></div></div>
+        <span class="hp" id="boss-hp-num">5/12</span>
+      </div>
+      <div class="opponent">
+        <div class="field">
+          <div class="field-card opp" id="opp-card">
+            <div class="tag">🧙 长老出牌</div>
+            <div class="word" id="opp-word">ambiguous</div>
+            <div class="phon">/æmˈbɪɡjuəs/</div>
+            <div class="def" id="opp-def">adj. 模棱两可的；含糊不清的</div>
+            <div class="atk" id="opp-atk">⚔️ 威胁 8</div>
+            <span class="dmg-num" id="opp-dmg" style="display:none">-3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vs">—— 答对出招 · 答错挨打 ——</div>
+
+      <!-- 题目（看义选词示例） -->
+      <div class="question">
+        <div class="qtype">📖 看义选词 · 第 4/10 题</div>
+        <div class="qword">adj. 模棱两可的；含糊不清的</div>
+        <div class="opts">
+          <div class="opt"><span class="k">A</span>ambiguous</div>
+          <div class="opt"><span class="k">B</span>elaborate</div>
+          <div class="opt"><span class="k">C</span>feasible</div>
+          <div class="opt"><span class="k">D</span>legitimate</div>
+        </div>
+      </div>
+
+      <!-- 玩家 -->
+      <div class="hpbar">
+        <span class="who">🛡️ 你</span>
+        <div class="track"><div class="fill" id="my-hp" style="width:60%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div>
+        <span class="hp" id="my-hp-num">3/5</span>
+      </div>
+
+      <div class="hand" id="hand">
+        <div class="hcard ssr" data-atk="72" onclick="selectCard(this)">
+          <span class="r">SSR</span><span class="w">contradict</span><span class="at">⚔️72</span><span class="df">🛡️58</span>
+        </div>
+        <div class="hcard ur sel" data-atk="88" onclick="selectCard(this)">
+          <span class="r">UR</span><span class="w">inevitable</span><span class="at">⚔️88</span><span class="df">🛡️64</span>
+        </div>
+        <div class="hcard ssr" data-atk="64" onclick="selectCard(this)">
+          <span class="r">SSR</span><span class="w">geography</span><span class="at">⚔️64</span><span class="df">🛡️62</span>
+        </div>
+        <div class="hcard sr" data-atk="42" onclick="selectCard(this)">
+          <span class="r">SR</span><span class="w">ability</span><span class="at">⚔️42</span><span class="df">🛡️48</span>
+        </div>
+        <div class="hcard ssr" data-atk="68" onclick="selectCard(this)">
+          <span class="r">SSR</span><span class="w">project</span><span class="at">⚔️68</span><span class="df">🛡️55</span>
+        </div>
+      </div>
+
+      <p class="battle-hint">答对：选中手牌飞出击破对手卡（伤害 = 卡牌 ATK + 连击加成）</p>
+      <button class="demo-btn" onclick="demoHit()">▶ 演示：答对出招动画</button>
+      <button class="demo-btn" style="background:var(--red);color:#fff" onclick="demoWrong()">▶ 演示：答错被反击</button>
+      <button class="demo-btn" style="background:var(--green);color:#0b1220" onclick="goResult()">🏆 演示：直接结算（胜利）</button>
+    </div>
+  </div>
+
+  <!-- ══════════ 页面 4：结算 ══════════ -->
+  <div class="page" id="page-result">
+    <div class="result">
+      <div class="trophy">🏆</div>
+      <h2>击败了词根长老！</h2>
+      <p class="sub">对 8/10 题 · 剩余 ❤️ 3 · 最高连击 🔥 5</p>
+      <span class="win-tag">✅ 限定词卡已收入图鉴</span>
+
+      <div class="drop">
+        <div class="drawn">
+          <div class="r">UR 限定词卡</div>
+          <div class="word">spectator</div>
+          <div class="def">n. 观众；旁观者<br/>词根技能：spect 家族 +2 ATK</div>
+        </div>
+      </div>
+
+      <div class="reward">
+        <div class="row"><span>💎 词力积分</span><b style="color:var(--amber)">+30</b></div>
+        <div class="row"><span>🎴 限定词卡掉落</span><b style="color:var(--amber)">UR · spectator</b></div>
+        <div class="row"><span>🎯 抽卡次数</span><b style="color:var(--blue)">+1（BOSS 胜利加成）</b></div>
+      </div>
+
+      <div class="btns">
+        <button class="ghost" onclick="goHome()">← 返回对战</button>
+        <button class="primary" onclick="goHome()">⚔️ 再战</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡牌详情弹层 -->
+  <div class="overlay" id="overlay" onclick="closeCard()">
+    <div class="bigcard ur" id="bigcard" onclick="event.stopPropagation()">
+      <div class="r" id="bc-r" style="color:var(--amber)">UR 传说</div>
+      <div class="word" id="bc-word">inevitable</div>
+      <div class="phon" id="bc-phon">/ɪnˈevɪtəbl/</div>
+      <div class="def" id="bc-def">adj. 不可避免的</div>
+      <div class="skill" id="bc-skill">🌀 词根技能：<b>ven 家族</b> · 上场时 ATK +8</div>
+      <div class="stats">
+        <div><b id="bc-atk" style="color:var(--red)">88</b><span>⚔️ 攻击</span></div>
+        <div><b id="bc-def" style="color:var(--blue)">64</b><span>🛡️ 防御</span></div>
+      </div>
+      <button class="close" onclick="closeCard()">收 起</button>
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <div class="tabbar">
+    <div class="tab" onclick="goHome()"><span class="ic">📖</span>今日</div>
+    <div class="tab" onclick="goDeck()"><span class="ic">📚</span>词库</div>
+    <div class="tab on"><span class="ic">⚔️</span>对战</div>
+    <div class="tab" onclick="goHome()"><span class="ic">🃏</span>图鉴</div>
+    <div class="tab" onclick="goHome()"><span class="ic">📊</span>统计</div>
+    <div class="tab" onclick="goHome()"><span class="ic">⚙️</span>设置</div>
+  </div>
+</div>
+
+<div class="demo-note">原型 v1 · 点击演示按钮体验动画</div>
+
+<script>
+  // ── 简易 hash 路由（#home / #deck / #battle / #result）──
+  const PAGES = { home: 'page-home', deck: 'page-deck', battle: 'page-battle', result: 'page-result' };
+  function show(name) {
+    for (const [k, id] of Object.entries(PAGES)) document.getElementById(id).classList.toggle('active', k === name);
+  }
+  function route() {
+    const h = (location.hash || '#home').replace('#', '');
+    show(PAGES[h] ? h : 'home');
+  }
+  window.addEventListener('hashchange', route);
+  route();
+
+  function goHome() { location.hash = '#home'; }
+  function goDeck() { location.hash = '#deck'; }
+  function openDeck() { goDeck(); }
+  function startBattle(which) { location.hash = '#battle'; }
+  function goResult() { location.hash = '#result'; }
+
+  // ── 卡牌详情 ──
+  const CARDS = [
+    { r: 'UR 传说', word: 'inevitable', phon: '/ɪnˈevɪtəbl/', def: 'adj. 不可避免的', skill: '🌀 词根技能：ven 家族 · 上场时 ATK +8', atk: 88, defv: 64 },
+    { r: 'UR 传说', word: 'biology', phon: '/baɪˈɒlədʒi/', def: 'n. 生物学', skill: '🧬 词根技能：bio 家族 · 与同族卡同场 ATK +6', atk: 76, defv: 70 },
+    { r: 'SSR 史诗', word: 'contradict', phon: '/ˌkɒntrəˈdɪkt/', def: 'vt. 反驳；相矛盾', skill: '💬 词根技能：dict 家族 · 出招时连击 +1', atk: 72, defv: 58 },
+    { r: 'SSR 史诗', word: 'geography', phon: '/dʒiˈɒɡrəfi/', def: 'n. 地理（学）', skill: '🌍 词根技能：geo 家族 · 防御 +8', atk: 64, defv: 62 },
+    { r: 'SSR 史诗', word: 'project', phon: '/ˈprɒdʒekt/', def: 'n. 项目 vt. 投射', skill: '🎯 词根技能：ject 家族 · 出招时连击 +1', atk: 68, defv: 55 },
+    { r: 'SSR 史诗', word: 'predict', phon: '/prɪˈdɪkt/', def: 'vt. 预测', skill: '💬 词根技能：dict 家族 · 与同族卡同场 ATK +6', atk: 70, defv: 50 },
+    { r: 'SR 稀有', word: 'ability', phon: '/əˈbɪləti/', def: 'n. 能力，才能', skill: '📖 无词根 · 基础卡', atk: 42, defv: 48 },
+    { r: 'SR 稀有', word: 'accept', phon: '/əkˈsept/', def: 'vt. 接受；认可', skill: '📖 无词根 · 基础卡', atk: 38, defv: 52 },
+    { r: 'SR 稀有', word: 'announce', phon: '/əˈnaʊns/', def: 'vt. 宣布', skill: '📖 无词根 · 基础卡', atk: 40, defv: 44 },
+    { r: 'SR 稀有', word: 'benefit', phon: '/ˈbenɪfɪt/', def: 'n./vt. 利益；有益于', skill: '📖 无词根 · 基础卡', atk: 36, defv: 50 },
+  ];
+  function openCard(i) {
+    const c = CARDS[i];
+    const bc = document.getElementById('bigcard');
+    bc.className = 'bigcard ' + (c.r.startsWith('UR') ? 'ur' : 'ssr');
+    document.getElementById('bc-r').textContent = c.r;
+    document.getElementById('bc-r').style.color = c.r.startsWith('UR') ? 'var(--amber)' : '#d946ef';
+    document.getElementById('bc-word').textContent = c.word;
+    document.getElementById('bc-phon').textContent = c.phon;
+    document.getElementById('bc-def').textContent = c.def;
+    document.getElementById('bc-skill').innerHTML = c.skill;
+    document.getElementById('bc-atk').textContent = c.atk;
+    document.getElementById('bc-def').textContent = c.def;
+    document.getElementById('overlay').classList.add('show');
+  }
+  function closeCard() { document.getElementById('overlay').classList.remove('show'); }
+
+  // ── 手牌选择 ──
+  function selectCard(el) {
+    document.querySelectorAll('#hand .hcard').forEach((c) => c.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  // ── 演示动画 ──
+  function demoHit() {
+    const card = document.getElementById('opp-card');
+    card.classList.remove('broken', 'shake');
+    void card.offsetWidth;
+    const dmg = document.getElementById('opp-dmg');
+    dmg.style.display = 'block';
+    dmg.textContent = '-3 🔥';
+    card.classList.add('shake');
+    const hp = document.getElementById('boss-hp');
+    const n = document.getElementById('boss-hp-num');
+    const cur = parseInt(n.textContent.split('/')[0], 10) - 3;
+    n.textContent = Math.max(0, cur) + '/12';
+    hp.style.width = Math.max(0, (cur / 12) * 100) + '%';
+    if (cur <= 0) {
+      setTimeout(() => { card.classList.add('broken'); }, 400);
+    }
+    setTimeout(() => { dmg.style.display = 'none'; }, 950);
+    const cn = document.getElementById('combo-num');
+    cn.textContent = parseInt(cn.textContent, 10) + 1;
+  }
+  function demoWrong() {
+    const card = document.getElementById('opp-card');
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    const my = document.getElementById('my-hp');
+    const n = document.getElementById('my-hp-num');
+    const cur = parseInt(n.textContent.split('/')[0], 10) - 1;
+    n.textContent = Math.max(0, cur) + '/5';
+    my.style.width = Math.max(0, (cur / 5) * 100) + '%';
+    document.getElementById('combo-num').textContent = '0';
+    const phone = document.getElementById('phone');
+    phone.style.animation = 'none';
+    void phone.offsetWidth;
+    phone.style.animation = 'shake .5s ease';
+  }
+</script>
+</body>
+</html>

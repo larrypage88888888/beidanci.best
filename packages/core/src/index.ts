@@ -98,14 +98,30 @@ export {
   isSeasonSettleDay,
 } from './rank';
 
-// 卡牌对战 PVE（词灵 BOSS 战）
-export type { BattleResult, BattleOutcomeInput, BuildBattleWordsInput } from './battle';
+// 卡牌对战（炉石式词灵对决）
+export type {
+  BattleResult,
+  BattleOutcomeInput,
+  BuildBattleWordsInput,
+  HandCard,
+  BattleRarity,
+  CardStatsInput,
+  BuildHandInput,
+} from './battle';
 export {
   BATTLE_QUESTION_COUNT,
-  PLAYER_MAX_HP,
+  HERO_MAX_HP,
+  MAX_MANA,
+  HAND_SIZE,
+  CARD_COST,
+  COMBO_BONUS_MAX,
   damageForCombo,
   battleOutcome,
   buildBattleWords,
+  cardStats,
+  buildHand,
+  opponentThreat,
+  summonDamage,
 } from './battle';
 
 // 题型工厂

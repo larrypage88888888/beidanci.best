@@ -109,6 +109,45 @@ body {
   animation: wf-dmg 0.9s ease-out forwards;
 }
 
+/* 卡牌对战：随从卡入场 / 受击震动 */
+@keyframes wf-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.wf-card-in {
+  animation: wf-card-in 0.4s ease;
+}
+
+@keyframes wf-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-7px);
+  }
+  40% {
+    transform: translateX(7px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.wf-shake {
+  animation: wf-shake 0.5s ease;
+}
+
 /* UR 传说卡光效 */
 @keyframes wf-glow-ur {
   0%,

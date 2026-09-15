@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { and, asc, desc, eq, isNotNull, isNull, lte, ne, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, isNull, lte, ne, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
 import {
@@ -18,28 +18,35 @@ import {
 import {
   BATTLE_QUESTION_COUNT,
   DUPLICATE_POINTS,
-  PLAYER_MAX_HP,
+  HAND_SIZE,
+  HERO_MAX_HP,
+  MAX_MANA,
   battleOutcome,
   buildBattleWords,
-  damageForCombo,
+  buildHand,
+  cardStats,
   generateQuestion,
   hashSeed,
   kindForIndex,
   mulberry32,
+  opponentThreat,
+  summonDamage,
 } from '@app/core';
-import type { WordMeta } from '@app/core';
+import type { HandCard, WordMeta } from '@app/core';
 import { requireAuth } from '../middleware/auth';
 import { dateKeyUtc, nowIso } from '../lib/time';
 import { getDb } from '../lib/db';
 import { loadWordsByIds } from '../lib/wordQueries';
 
 /**
- * 卡牌对战 PVE（用户需求：游戏化背单词 · 词灵 BOSS 战）
+ * 卡牌对战（炉石式 PVE 词灵对决）
  *
- * - 出招 = 现有三种题型作答：答对攻击 BOSS（连击加成伤害），答错被反击扣血
- * - 服务端出题并权威判定（题目含答案存入 state，前端只提交选择/拼写）
- * - 胜利：词力积分 + 抽卡次数加成（daily_stats.battle_wins）+ BOSS 主题限定卡掉落
- * - 每日每 BOSS 限 1 次（start 时占坑，防刷限定卡）；mode 预留 pvp
+ * - 英雄对决：玩家 30 血 vs 词灵 BOSS 英雄血（30/35/40）
+ * - 每回合对手打出一张词灵随从（= 当前题目词），你答题破解
+ * - 答对 → 法力 +1，召唤手牌词卡随从攻击（伤害 = ATK + 连击加成）；答错 → 被随从反击（英雄扣威胁值）
+ * - 手牌：开局从已收集词卡随机发 5 张（费用 SR1/SSR2/UR3，ATK 随难度，词根家族 +2）
+ * - 服务端出题并权威判定；奖励：胜=积分+主题限定卡+抽卡次数，败=5 积分，每日每 BOSS 1 次
+ * - 架构预留：mode 字段（pve | pvp），后续 PVP 复用同一套结算
  */
 export const battleRoutes = new Hono<AppEnv>();
 battleRoutes.use('*', requireAuth);
@@ -81,6 +88,7 @@ interface BattleQuestion {
   kind: string;
   wordId: string;
   wordText: string;
+  difficulty: number | null;
   prompt: string;
   options?: Array<{ key: string; text: string }>;
   answerKey?: string;
@@ -94,10 +102,12 @@ interface BattleQuestion {
 interface BattleState {
   questions: BattleQuestion[];
   idx: number;
-  playerHp: number;
+  heroHp: number;
   bossHp: number;
   combo: number;
   correct: number;
+  mana: number;
+  hand: HandCard[];
 }
 
 /** BOSS 主题掉落词池（root=词根家族词；spell=长难词；vocab=高频词） */
@@ -122,6 +132,61 @@ async function themePool(db: ReturnType<typeof getDb>, theme: string): Promise<s
     .orderBy(asc(words.difficulty))
     .limit(120);
   return rows.map((r) => r.id);
+}
+
+/** 开局手牌：优先已收集词卡，不足用目标词书词兜底（SR 1 费保证可出招） */
+async function buildHandCards(
+  db: ReturnType<typeof getDb>,
+  userId: string,
+  fallbackIds: string[],
+  seed: number,
+): Promise<HandCard[]> {
+  const collected = await db
+    .select({ wordId: userCards.wordId, rarity: userCards.rarity })
+    .from(userCards)
+    .where(eq(userCards.userId, userId))
+    .limit(200);
+  let raw = collected.map((c) => ({ wordId: c.wordId, rarity: c.rarity as HandCard['rarity'] }));
+  if (raw.length === 0) {
+    raw = fallbackIds.slice(0, 40).map((wordId) => ({ wordId, rarity: 'SR' as HandCard['rarity'] }));
+  }
+  const ids = [...new Set(raw.map((c) => c.wordId))].slice(0, 60);
+  const wordRows = await loadWordsByIds(db, ids);
+  const wordMap = new Map(wordRows.map((w) => [w.id, w]));
+
+  let rootIds: string[] = [];
+  if (ids.length > 0) {
+    const roots = await db.select({ wordId: wordRootMap.wordId }).from(wordRootMap).where(inArray(wordRootMap.wordId, ids));
+    rootIds = roots.map((r) => r.wordId);
+  }
+  const rootSet = new Set(rootIds);
+
+  const rng = mulberry32(seed ^ 0x5f3759df);
+  const picked = buildHand({
+    cards: raw
+      .filter((c) => wordMap.has(c.wordId))
+      .map((c) => ({ wordId: c.wordId, rarity: c.rarity, difficulty: wordMap.get(c.wordId)?.difficulty ?? null, hasRoot: rootSet.has(c.wordId) })),
+    count: HAND_SIZE,
+    rng,
+  });
+  const cards: HandCard[] = [];
+  for (const wordId of picked) {
+    const w = wordMap.get(wordId);
+    if (!w) continue;
+    const r = raw.find((c) => c.wordId === wordId)?.rarity ?? 'SR';
+    const stats = cardStats({ difficulty: w.difficulty, rarity: r, hasRoot: rootSet.has(wordId) });
+    cards.push({
+      wordId,
+      wordText: w.text,
+      ...(w.phonetic ? { phonetic: w.phonetic } : {}),
+      rarity: r,
+      cost: stats.cost,
+      atk: stats.atk,
+      hp: stats.hp,
+      ...(stats.skill ? { skill: stats.skill } : {}),
+    });
+  }
+  return cards;
 }
 
 // GET /api/battle/bosses —— BOSS 列表 + 今日挑战状态
@@ -158,13 +223,13 @@ battleRoutes.get('/bosses', async (c) => {
     bosses,
     battleWinsToday: stats?.[0]?.battleWins ?? 0,
     questionCount: BATTLE_QUESTION_COUNT,
-    playerMaxHp: PLAYER_MAX_HP,
+    heroMaxHp: HERO_MAX_HP,
   });
 });
 
 const StartSchema = z.object({ bossId: z.string().min(1).max(40) });
 
-// POST /api/battle/start —— 开战（占坑每日挑战 + 生成 10 题）
+// POST /api/battle/start —— 开战（占坑每日挑战 + 生成 10 题 + 发 5 张手牌）
 battleRoutes.post('/start', async (c) => {
   const userId = c.get('userId');
   const db = getDb(c.env);
@@ -250,19 +315,24 @@ battleRoutes.post('/start', async (c) => {
       kind: kindForIndex(i),
       seed: hashSeed(`${wordIds[i]}:${boss.id}:${seed}`),
     });
-    questions.push({ ...q, wordText: word.text });
+    questions.push({ ...q, wordText: word.text, difficulty: word.difficulty ?? null });
   }
   if (questions.length === 0) {
     return c.json({ error: 'no_words', message: '词库还没有词，稍后再来挑战吧' }, 409);
   }
 
+  // ── 开局手牌（已收集词卡随机发 5 张）──
+  const hand = await buildHandCards(db, userId, fallback, seed);
+
   const state: BattleState = {
     questions,
     idx: 0,
-    playerHp: PLAYER_MAX_HP,
+    heroHp: HERO_MAX_HP,
     bossHp: boss.hp,
     combo: 0,
     correct: 0,
+    mana: 0,
+    hand,
   };
 
   const [inserted] = await db
@@ -280,9 +350,12 @@ battleRoutes.post('/start', async (c) => {
     battleId: inserted.id,
     boss: { id: boss.id, name: boss.name, emoji: boss.emoji, difficulty: boss.difficulty, hp: boss.hp, rewardRarity: boss.rewardRarity },
     total: questions.length,
-    playerHp: state.playerHp,
+    turn: 1,
+    heroHp: state.heroHp,
     bossHp: state.bossHp,
+    mana: state.mana,
     combo: 0,
+    hand,
     question: questions[0],
   });
 });
@@ -293,6 +366,8 @@ const AnswerSchema = z.object({
   picked: z.string().min(1).max(1).optional(),
   /** 拼写题作答 */
   typed: z.string().max(80).optional(),
+  /** 选中的手牌卡（出招用）；缺省时服务端自动选可用最高 ATK 卡 */
+  cardId: z.string().max(40).optional(),
 });
 
 // POST /api/battle/answer —— 逐题作答（服务端权威判定，答完自动结算）
@@ -327,19 +402,32 @@ battleRoutes.post('/answer', async (c) => {
   }
 
   let damage = 0;
+  let threat = 0;
+  let summoned: HandCard | null = null;
   if (correct) {
     state.combo += 1;
-    damage = damageForCombo(state.combo);
-    state.bossHp -= damage;
     state.correct += 1;
+    state.mana = Math.min(MAX_MANA, state.mana + 1);
+    // 选卡：指定且可负担 → 用之；否则自动选最高 ATK 的可负担卡；再不行用最便宜的
+    const chosen =
+      state.hand.find((h) => h.wordId === parsed.data.cardId && h.cost <= state.mana) ??
+      state.hand.filter((h) => h.cost <= state.mana).sort((a, b) => b.atk - a.atk)[0] ??
+      [...state.hand].sort((a, b) => a.cost - b.cost)[0];
+    if (chosen) {
+      summoned = chosen;
+      state.mana -= chosen.cost;
+      damage = summonDamage(chosen.atk, state.combo);
+      state.bossHp = Math.max(0, state.bossHp - damage);
+    }
   } else {
     state.combo = 0;
-    state.playerHp -= 1;
+    threat = opponentThreat(q.difficulty);
+    state.heroHp = Math.max(0, state.heroHp - threat);
   }
   state.idx += 1;
 
   const outcome = battleOutcome({
-    playerHp: state.playerHp,
+    playerHp: state.heroHp,
     bossHp: state.bossHp,
     answered: state.idx,
     total: state.questions.length,
@@ -354,18 +442,23 @@ battleRoutes.post('/answer', async (c) => {
     return c.json({
       correct,
       damage,
+      threat,
       combo: state.combo,
-      playerHp: state.playerHp,
+      heroHp: state.heroHp,
       bossHp: state.bossHp,
+      mana: state.mana,
       answered: state.idx,
+      turn: state.idx + 1,
       finished: false,
       result: null,
+      summoned,
+      hand: state.hand,
       next: state.questions[state.idx] ?? null,
       reveal: correct ? null : (q.wordText ?? null),
     });
   }
 
-  // ── 结算 ──
+  // ── 结算（奖励与每日限制与既有规则一致）──
   const win = outcome === 'win';
   const [boss] = await db.select().from(bossEvents).where(eq(bossEvents.id, battle.bossId)).limit(1);
   let rewardPoints = win ? (boss?.rewardPoints ?? 30) : 5;
@@ -435,7 +528,7 @@ battleRoutes.post('/answer', async (c) => {
     .set({
       status: 'finished',
       result: outcome,
-      playerHp: state.playerHp,
+      playerHp: state.heroHp,
       bossHp: state.bossHp,
       correct: state.correct,
       rewardPoints,
@@ -455,15 +548,20 @@ battleRoutes.post('/answer', async (c) => {
   return c.json({
     correct,
     damage,
+    threat,
     combo: state.combo,
-    playerHp: state.playerHp,
+    heroHp: state.heroHp,
     bossHp: state.bossHp,
+    mana: state.mana,
     answered: state.idx,
+    turn: state.idx + 1,
     finished: true,
     result: outcome,
     win,
     total: state.questions.length,
     correctCount: state.correct,
+    summoned,
+    hand: state.hand,
     reveal: correct ? null : (q.wordText ?? null),
     reward: { points: rewardPoints, card },
   });

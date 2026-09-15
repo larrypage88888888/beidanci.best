@@ -237,7 +237,7 @@ export interface WordbooksResponse {
   items: WordbookItem[];
 }
 
-/* ── 卡牌对战 PVE（词灵 BOSS 战） ── */
+/* ── 卡牌对战（炉石式词灵对决） ── */
 export type BattleRarity = 'SR' | 'SSR' | 'UR';
 
 export interface BattleBoss {
@@ -258,7 +258,7 @@ export interface BossesResponse {
   bosses: BattleBoss[];
   battleWinsToday: number;
   questionCount: number;
-  playerMaxHp: number;
+  heroMaxHp: number;
 }
 
 export interface BattleQuestion {
@@ -266,6 +266,7 @@ export interface BattleQuestion {
   kind: 'meaning-choice' | 'word-choice' | 'spell';
   wordId: string;
   wordText: string;
+  difficulty: number | null;
   prompt: string;
   options?: Array<{ key: string; text: string }>;
   answerKey?: string;
@@ -276,28 +277,49 @@ export interface BattleQuestion {
   phonetic?: string;
 }
 
+/** 词卡随从（手牌） */
+export interface HandCard {
+  wordId: string;
+  wordText: string;
+  phonetic?: string;
+  rarity: BattleRarity;
+  cost: number;
+  atk: number;
+  hp: number;
+  skill?: string;
+}
+
 export interface BattleStartResponse {
   battleId: number;
   boss: { id: string; name: string; emoji: string | null; difficulty: number; hp: number; rewardRarity: BattleRarity };
   total: number;
-  playerHp: number;
+  turn: number;
+  heroHp: number;
   bossHp: number;
+  mana: number;
   combo: number;
+  hand: HandCard[];
   question: BattleQuestion;
 }
 
 export interface BattleAnswerResponse {
   correct: boolean;
   damage: number;
+  threat: number;
   combo: number;
-  playerHp: number;
+  heroHp: number;
   bossHp: number;
+  mana: number;
   answered: number;
+  turn: number;
   finished: boolean;
   result: 'win' | 'lose' | null;
   win?: boolean;
   total?: number;
   correctCount?: number;
+  /** 本次召唤出招的随从卡（答对时） */
+  summoned: HandCard | null;
+  hand: HandCard[];
   next: BattleQuestion | null;
   reveal: string | null;
   reward?: {
