@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage';
 import CollectionPage from './pages/CollectionPage';
 import RankPage from './pages/RankPage';
 import RootsPage from './pages/RootsPage';
+import BattlePage from './pages/BattlePage';
 
 /** 登录守卫 + 摸底引导：未登录去登录页；没做过摸底先去做题 */
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -116,6 +117,16 @@ export default function App() {
           <RequireAuth>
             <Layout>
               <RootsPage />
+            </Layout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/battle"
+        element={
+          <RequireAuth>
+            <Layout>
+              <BattlePage />
             </Layout>
           </RequireAuth>
         }

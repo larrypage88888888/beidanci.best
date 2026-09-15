@@ -14,6 +14,7 @@
 | 📋 每日动态组单 | 新词池(水平±半档) ∪ 到期复习词，复习热身+穿插；Cron 每日预物化 |
 | 🔁 权威回写 | POST /reviews 批量调度，乐观镜像被服务端结果校正 |
 | ❓ 三种题型 | 看词选义 / 看义选词 / 拼写默写（共享 @app/core 本地确定性出题） |
+| ⚔️ 卡牌对战 | PVE 词灵 BOSS 战：答题当出招，答对连击伤害打 BOSS、答错被反击；胜得词力积分+抽卡次数+限定词卡 |
 | 🔥 游戏化 | streak 连续打卡、经验等级、徽章（first_review/streak_3/streak_7） |
 | 🔐 账号 | JWT(HS256, Web Crypto) + PBKDF2 密码哈希 |
 | 📱 PWA | 可安装、离线壳缓存（vite-plugin-pwa） |
@@ -52,7 +53,7 @@ pnpm dev:web             # http://localhost:5173
 
 | 命令 | 作用 |
 |---|---|
-| `pnpm test` | core 单元测试（73 个用例：调度/迁移/组单/题型边界/连击/词苗/抽卡/段位） |
+| `pnpm test` | core 单元测试（83 个用例：调度/迁移/组单/题型边界/连击/词苗/抽卡/段位/对战） |
 | `pnpm typecheck` | 全仓 TS 类型检查 |
 | `pnpm build` | 全仓构建 |
 | `pnpm --filter @app/web build` | 前端生产构建（含 SW 生成） |
@@ -66,6 +67,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/e2e-modes.mjs [origin]` | FSRS↔艾宾浩斯模式切换进度迁移 + 每日新词配额（12 步） |
 | `node scripts/e2e-gamification.mjs [origin]` | P0 趣味化：连击纪录/词苗建卡/抽卡资格/图鉴/积分（12 步） |
 | `node scripts/e2e-p1.mjs [origin]` | P1 成长感：段位结算/词书解锁门槛/词根树点亮/切词书（21 步） |
+| `node scripts/e2e-battle.mjs [origin]` | 卡牌对战：BOSS 列表/开战/全对 WIN（掉落限定卡）/每日 409/全错 LOSE（17 步） |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设
@@ -85,6 +87,9 @@ GET  /api/cards/collection          词卡图鉴 + 词力积分 + 今日抽卡�
 POST /api/cards/draw                抽词卡（重复自动转积分）
 GET  /api/rank/current              段位与赛季进度（词汇量+7天正确率+活跃天数 → 青铜~词霸）
 GET  /api/roots                     词根技能树（15 词根，家族词点亮状态）
+GET  /api/battle/bosses             词灵 BOSS 列表 + 今日挑战状态
+POST /api/battle/start              开战（每日每 BOSS 限 1 次；生成 10 题，服务端权威判定）
+POST /api/battle/answer             逐题作答（答对攻击/答错反击，自动结算奖励与掉落）
 GET  /api/wordbooks                 词书列表（含段位解锁状态 locked/minTier）
 GET  /api/wordpack/:book/:version   词条包（KV 缓存 1h）
 GET  /api/health                    健康检查
@@ -109,12 +114,13 @@ Cron UTC00:30 每月1号                段位月度结算落库 + 历史最高�
 | ⭐ 段位系统 | 评分 = 词汇量(log)45 + 近7天正确率25 + 活跃天数30 → 青铜/白银/黄金/铂金/钻石/词霸；每月 1 号结算落库，保留历史最高段位 |
 | 📖 词书解锁 | wordbooks.min_tier 门槛，历史最高段位达标才可选（如 CET-6 需黄金）；切换目标词书次日生效，动态选词闭环 |
 | 🌳 词根技能树 | 15 个常用词根内置（bio/geo/spect/…），学到含该词根的词即点亮节点；SVG 径向网络图零依赖，"已掌握 xx 家族 n/m 个" |
+| ⚔️ 卡牌对战 | 词灵 BOSS 战（词根长老/拼写魔王/词汇暴君）：答题出招、连击增伤、答错挨打；每日每 BOSS 1 次，胜得积分+BOSS 主题限定卡+抽卡次数加成；作答计入今日进度 |
 
 ## 部署到 Cloudflare（生产）
 
 1. `wrangler d1 create wordflow-db`、`wrangler kv namespace create CACHE`，
    把真实 id 填入 `apps/server/wrangler.jsonc`；
-2. 依次执行全部迁移（0001_init → 0008_seed_cet6，幂等；0002 重新生成过，
+2. 依次执行全部迁移（0001_init → 0009_battle，幂等；0002 重新生成过，
    重跑以补充词根家族词）：
    `wrangler d1 execute wordflow-db --remote --file=../../packages/db/migrations/000X_*.sql`；
 3. `wrangler secret put JWT_SECRET`；
@@ -144,8 +150,8 @@ Cron UTC00:30 每月1号                段位月度结算落库 + 历史最高�
 ### 本地数据恢复（线上 → 本地）
 
 ```bash
-# 1) 让本地库结构与线上一致（0001~0008 都执行一遍，幂等可重复）
-for f in 0001_init 0002_seed_cet4 0003_add_example_columns 0004_seed_examples 0005_app_meta 0006_gamification 0007_gamification_p1 0008_seed_cet6; do
+# 1) 让本地库结构与线上一致（0001~0009 都执行一遍，幂等可重复）
+for f in 0001_init 0002_seed_cet4 0003_add_example_columns 0004_seed_examples 0005_app_meta 0006_gamification 0007_gamification_p1 0008_seed_cet6 0009_battle; do
   pnpm --filter @app/server exec wrangler d1 execute wordflow-db --local --file="../../packages/db/migrations/$f.sql"
 done
 

@@ -236,3 +236,72 @@ export interface WordbooksResponse {
   bestTier: number;
   items: WordbookItem[];
 }
+
+/* ── 卡牌对战 PVE（词灵 BOSS 战） ── */
+export type BattleRarity = 'SR' | 'SSR' | 'UR';
+
+export interface BattleBoss {
+  id: string;
+  name: string;
+  emoji: string | null;
+  theme: string;
+  difficulty: number;
+  hp: number;
+  rewardPoints: number;
+  rewardRarity: BattleRarity;
+  description: string | null;
+  playedToday: boolean;
+  wonToday: boolean;
+}
+
+export interface BossesResponse {
+  bosses: BattleBoss[];
+  battleWinsToday: number;
+  questionCount: number;
+  playerMaxHp: number;
+}
+
+export interface BattleQuestion {
+  id: string;
+  kind: 'meaning-choice' | 'word-choice' | 'spell';
+  wordId: string;
+  wordText: string;
+  prompt: string;
+  options?: Array<{ key: string; text: string }>;
+  answerKey?: string;
+  accept?: string[];
+  hint?: string;
+  example?: string;
+  exampleZh?: string;
+  phonetic?: string;
+}
+
+export interface BattleStartResponse {
+  battleId: number;
+  boss: { id: string; name: string; emoji: string | null; difficulty: number; hp: number; rewardRarity: BattleRarity };
+  total: number;
+  playerHp: number;
+  bossHp: number;
+  combo: number;
+  question: BattleQuestion;
+}
+
+export interface BattleAnswerResponse {
+  correct: boolean;
+  damage: number;
+  combo: number;
+  playerHp: number;
+  bossHp: number;
+  answered: number;
+  finished: boolean;
+  result: 'win' | 'lose' | null;
+  win?: boolean;
+  total?: number;
+  correctCount?: number;
+  next: BattleQuestion | null;
+  reveal: string | null;
+  reward?: {
+    points: number;
+    card: { wordId: string | null; rarity: BattleRarity | null; duplicate: boolean; pointsGained: number } | null;
+  };
+}

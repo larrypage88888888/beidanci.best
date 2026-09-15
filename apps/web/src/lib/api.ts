@@ -1,5 +1,8 @@
 import { getToken, setToken } from './token';
 import type {
+  BattleAnswerResponse,
+  BattleStartResponse,
+  BossesResponse,
   CollectionResponse,
   DrawResponse,
   MeResponse,
@@ -91,6 +94,16 @@ export const api = {
   rankCurrent: () => request<RankResponse>('/api/rank/current'),
   roots: () => request<RootsResponse>('/api/roots'),
   wordbooks: () => request<WordbooksResponse>('/api/wordbooks'),
+
+  /** 卡牌对战 PVE：词灵 BOSS 战 */
+  battleBosses: () => request<BossesResponse>('/api/battle/bosses'),
+  battleStart: (bossId: string) =>
+    request<BattleStartResponse>('/api/battle/start', { method: 'POST', body: JSON.stringify({ bossId }) }),
+  battleAnswer: (battleId: number, ans: { picked?: string; typed?: string }) =>
+    request<BattleAnswerResponse>('/api/battle/answer', {
+      method: 'POST',
+      body: JSON.stringify({ battleId, ...ans }),
+    }),
 
   placementStart: () =>
     request<{ question: PlacementQuestion; progress: { current: number; total: number }; sessionToken: string }>(

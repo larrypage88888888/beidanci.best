@@ -211,12 +211,19 @@ export function rollCardRarity(seed: number): CardRarity {
 }
 
 /** 今日可抽次数与剩余次数（eligible - 已抽） */
-export function cardDrawAllowance(opts: { answeredToday: number; comboBest: number; drawn: number }): {
+export function cardDrawAllowance(opts: {
+  answeredToday: number;
+  comboBest: number;
+  drawn: number;
+  /** P1.5 卡牌对战：每日 BOSS 胜利 +1 抽卡次数 */
+  battleWinsToday?: number;
+}): {
   eligible: number;
   remaining: number;
 } {
   const base = opts.answeredToday >= CARD_ANSWER_THRESHOLD ? 1 : 0;
   const extra = opts.comboBest >= CARD_COMBO_EXTRA ? 1 : 0;
-  const eligible = base + extra;
+  const battle = Math.max(0, Math.floor(opts.battleWinsToday ?? 0));
+  const eligible = base + extra + battle;
   return { eligible, remaining: Math.max(0, eligible - opts.drawn) };
 }

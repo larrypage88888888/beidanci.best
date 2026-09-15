@@ -98,6 +98,16 @@ export {
   isSeasonSettleDay,
 } from './rank';
 
+// 卡牌对战 PVE（词灵 BOSS 战）
+export type { BattleResult, BattleOutcomeInput, BuildBattleWordsInput } from './battle';
+export {
+  BATTLE_QUESTION_COUNT,
+  PLAYER_MAX_HP,
+  damageForCombo,
+  battleOutcome,
+  buildBattleWords,
+} from './battle';
+
 // 题型工厂
 export type { QuestionKind, QuizQuestion, ChoiceOption } from './quizFactory';
 export {

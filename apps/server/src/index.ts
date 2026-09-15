@@ -12,6 +12,7 @@ import { myWordsRoutes } from './routes/myWords';
 import { cardsRoutes } from './routes/cards';
 import { rankRoutes } from './routes/rank';
 import { rootsRoutes } from './routes/roots';
+import { battleRoutes } from './routes/battle';
 import { materializeAllPlans } from './cron/materializePlans';
 import { settleAllRanks } from './cron/settleRanks';
 import { isSeasonSettleDay } from '@app/core';
@@ -53,6 +54,7 @@ app.route('/api/words', myWordsRoutes);
 app.route('/api/cards', cardsRoutes);
 app.route('/api/rank', rankRoutes);
 app.route('/api/roots', rootsRoutes);
+app.route('/api/battle', battleRoutes);
 app.route('/api/dev', devRoutes);
 
 export default {

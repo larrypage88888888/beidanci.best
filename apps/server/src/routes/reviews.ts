@@ -273,6 +273,7 @@ reviewsRoutes.post('/', async (c) => {
     answeredToday: todayStats?.totalCount ?? 0,
     comboBest: todayStats?.maxCombo ?? 0,
     drawn: todayStats?.cardsDrawn ?? 0,
+    battleWinsToday: todayStats?.battleWins ?? 0,
   });
 
   return c.json({

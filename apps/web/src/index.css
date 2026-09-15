@@ -89,6 +89,26 @@ body {
   animation: wf-fade-up 1.4s ease-out forwards;
 }
 
+/* 卡牌对战：伤害数字上浮 */
+@keyframes wf-dmg {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.7);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(1);
+  }
+}
+
+.wf-dmg {
+  animation: wf-dmg 0.9s ease-out forwards;
+}
+
 /* UR 传说卡光效 */
 @keyframes wf-glow-ur {
   0%,

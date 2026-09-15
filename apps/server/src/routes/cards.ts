@@ -46,6 +46,7 @@ async function todayAllowance(db: ReturnType<typeof getDb>, userId: string, date
       answeredToday: today?.totalCount ?? 0,
       comboBest: today?.maxCombo ?? 0,
       drawn: today?.cardsDrawn ?? 0,
+      battleWinsToday: today?.battleWins ?? 0,
     }),
     today,
   };

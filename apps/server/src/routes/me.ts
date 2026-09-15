@@ -79,6 +79,7 @@ meRoutes.get('/', async (c) => {
     answeredToday: today?.totalCount ?? 0,
     comboBest: today?.maxCombo ?? 0,
     drawn: today?.cardsDrawn ?? 0,
+    battleWinsToday: today?.battleWins ?? 0,
   });
 
   // C10 段位概览（只读计算，不落库——结算在 /api/rank/current 与月度 Cron）

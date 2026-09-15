@@ -121,6 +121,8 @@ export const dailyStats = sqliteTable(
     maxCombo: integer('max_combo').notNull().default(0),
     /** 当日已抽词卡次数（抽卡资格扣减） */
     cardsDrawn: integer('cards_drawn').notNull().default(0),
+    /** 当日 BOSS 战胜利数（抽卡资格加成） */
+    battleWins: integer('battle_wins').notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.userId, t.date] })],
 );
@@ -213,4 +215,50 @@ export const wordRootMap = sqliteTable(
     root: text('root').notNull(),
   },
   (t) => [primaryKey({ columns: [t.wordId, t.root] })],
+);
+
+/* ── 卡牌对战 PVE（用户需求，预留 PVP mode） ── */
+
+/** 词灵 BOSS 配置（内置种子） */
+export const bossEvents = sqliteTable('boss_events', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  emoji: text('emoji'),
+  theme: text('theme').notNull(), // root | spell | vocab（掉落词池）
+  difficulty: integer('difficulty').notNull().default(1),
+  hp: integer('hp').notNull().default(12),
+  rewardPoints: integer('reward_points').notNull().default(30),
+  rewardRarity: text('reward_rarity').notNull().default('SSR'),
+  description: text('description'),
+});
+
+/** 用户战斗记录（状态机：进行中 state_json → finished 结算） */
+export const userBattles = sqliteTable('user_battles', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull(),
+  bossId: text('boss_id').notNull(),
+  mode: text('mode').notNull().default('pve'), // 预留 pvp
+  status: text('status').notNull().default('pending'),
+  stateJson: text('state_json').notNull(),
+  result: text('result'), // win | lose
+  playerHp: integer('player_hp'),
+  bossHp: integer('boss_hp'),
+  correct: integer('correct').notNull().default(0),
+  rewardPoints: integer('reward_points').notNull().default(0),
+  rewardWordId: text('reward_word_id'),
+  rewardRarity: text('reward_rarity'),
+  startedAt: text('started_at').notNull(),
+  finishedAt: text('finished_at'),
+});
+
+/** 每日每 BOSS 挑战记录（防刷限定卡） */
+export const userBossDaily = sqliteTable(
+  'user_boss_daily',
+  {
+    userId: text('user_id').notNull(),
+    bossId: text('boss_id').notNull(),
+    date: text('date').notNull(),
+    won: integer('won').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.bossId, t.date] })],
 );
