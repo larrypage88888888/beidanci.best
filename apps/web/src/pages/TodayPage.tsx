@@ -41,6 +41,16 @@ export default function TodayPage() {
     return { review, fresh };
   }, [s.questions, s.idx, s.items]);
 
+  // 剩余题里还没作答的新词数（独立预习入口用；预习与做题已分开）
+  const previewNewCount = useMemo(() => {
+    const ids = new Set<string>();
+    for (let i = s.idx; i < s.questions.length; i++) {
+      const item = s.items.get(s.questions[i].wordId);
+      if (item?.entry === 'new') ids.add(item.id);
+    }
+    return ids.size;
+  }, [s.questions, s.idx, s.items]);
+
   // 答题期间禁止重复点击
   const [locked, setLocked] = useState(false);
   useEffect(() => setLocked(s.phase === 'submitting'), [s.phase]);
@@ -178,7 +188,7 @@ export default function TodayPage() {
     );
   }
 
-  /* ---------- 预习词卡：学习前先过一遍所有单词 ---------- */
+  /* ---------- 预习（独立入口）：只有预习卡，翻完可一键进入做题 ---------- */
   if (s.phase === 'preview') {
     const item = s.items.get(s.previewIds[0] ?? '');
     if (!item) {
@@ -188,12 +198,11 @@ export default function TodayPage() {
         </div>
       );
     }
-    const doneCount = total - s.previewIds.length;
     return (
       <PreviewCard
         item={item}
-        index={doneCount + 1}
-        total={total}
+        index={s.previewTotal - s.previewIds.length + 1}
+        total={s.previewTotal}
         isLast={s.previewIds.length === 1}
         onNext={() => s.advancePreview()}
         onSkip={() => s.skipPreview()}
@@ -237,6 +246,17 @@ export default function TodayPage() {
         </div>
         <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-bold text-orange-600">🔥 {s.streak}</span>
       </div>
+
+      {/* 独立预习入口：预习卡与做题卡片完全分开，点进去只翻新词预习卡 */}
+      {previewNewCount > 0 && !locked && (
+        <button
+          onClick={() => s.startPreview()}
+          className="mb-3 w-full rounded-xl border border-blue-200 bg-blue-50/70 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
+        >
+          📖 预习新词（{previewNewCount}）· 先看词义再做题
+        </button>
+      )}
+
       <div className="mb-2 flex justify-end">
         <ComboBadge count={s.combo.count} best={s.combo.best} />
       </div>

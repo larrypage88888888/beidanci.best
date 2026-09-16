@@ -57,6 +57,8 @@ interface SessionState {
   relearnAttempts: Record<string, number>;
   /** 预习词卡待展示的词（队首=当前卡）；仅当队列含新词时启用 */
   previewIds: string[];
+  /** 本轮预习的总卡数（预习进度展示用） */
+  previewTotal: number;
   /** 会话内连击（答对+1/答错归零；best 用于当日纪录与抽卡加成） */
   combo: { count: number; best: number };
   /** 服务端回写的词苗状态（P0 §十） */
@@ -73,6 +75,8 @@ interface SessionState {
   skipFlush: () => Promise<void>;
   /** 重学卡片点「出题考我」：为当前词生成新题并进入答题 */
   acceptRelearn: () => void;
+  /** 独立预习：只翻今天剩余新词的预习卡（与做题流程分开），翻完可一键进入做题 */
+  startPreview: () => void;
   /** 预习词卡「下一个」；最后一张后进入做题 */
   advancePreview: () => void;
   /** 跳过剩余预习词卡，直接进入做题 */
@@ -124,6 +128,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
   inRelearnRound: false,
   relearnAttempts: {},
   previewIds: [],
+  previewTotal: 0,
   combo: newCombo(),
   pet: null,
   cardDraw: null,
@@ -139,10 +144,9 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
       const { items, questions } = buildQuestions(t);
       questionStartAt = Date.now();
 
-      // 队列含新词 → 先过一遍预习词卡；纯复习快闪轮直接开打
-      const hasNew = (t.items ?? []).some((i) => i.entry === 'new');
+      // 学习与预习分开：直接进入做题；预习由用户从独立入口（startPreview）进入
       set({
-        phase: questions.length === 0 ? 'done' : hasNew ? 'preview' : 'learning',
+        phase: questions.length === 0 ? 'done' : 'learning',
         date: t.date,
         mode: t.scheduleMode,
         items,
@@ -158,7 +162,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         relearnQueue: [],
         inRelearnRound: false,
         relearnAttempts: {},
-        previewIds: hasNew && questions.length > 0 ? [...t.remainingOrder] : [],
+        previewIds: [],
+        previewTotal: 0,
         combo: newCombo(),
         pet: null,
         cardDraw: null,
@@ -183,9 +188,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
       }
       const { items, questions } = buildQuestions(t);
       questionStartAt = Date.now();
-      const hasNew = (t.items ?? []).some((i) => i.entry === 'new');
       set({
-        phase: hasNew ? 'preview' : 'learning',
+        phase: 'learning',
         date: t.date,
         mode: t.scheduleMode,
         items,
@@ -201,7 +205,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         relearnQueue: [],
         inRelearnRound: false,
         relearnAttempts: {},
-        previewIds: hasNew ? [...t.remainingOrder] : [],
+        previewIds: [],
+        previewTotal: 0,
         combo: newCombo(),
         pet: null,
         cardDraw: null,
@@ -289,6 +294,20 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
       relearnAttempts: { ...s.relearnAttempts, [wordId]: (s.relearnAttempts[wordId] ?? 0) + 1 },
       phase: 'learning',
     });
+  },
+
+  /** 独立预习：只翻当前队列里还没作答的新词预习卡；与做题流程完全分开 */
+  startPreview: () => {
+    const s = get();
+    if (s.phase !== 'learning' && s.phase !== 'done') return;
+    const ids = new Set<string>();
+    for (let i = s.idx; i < s.questions.length; i++) {
+      const item = s.items.get(s.questions[i].wordId);
+      if (item?.entry === 'new') ids.add(item.id);
+    }
+    const unique = [...ids];
+    if (unique.length === 0) return;
+    set({ previewIds: unique, previewTotal: unique.length, phase: 'preview' });
   },
 
   advancePreview: () => {
