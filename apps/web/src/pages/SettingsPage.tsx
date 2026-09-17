@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ScheduleMode } from '@app/core';
 import { api } from '../lib/api';
-import { setSpeechAutoEnabled, speechAutoEnabled, speak } from '../lib/speech';
+import { setSpeechAutoEnabled, speechAutoEnabled, speechProbe, speechSupported, speak } from '../lib/speech';
 import { useAuthStore } from '../stores/auth';
 import { useSessionStore } from '../stores/session';
 
@@ -20,6 +20,16 @@ export default function SettingsPage() {
   const [devMsg, setDevMsg] = useState<string | null>(null);
   const [devOk, setDevOk] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(() => speechAutoEnabled());
+  /** 语音引擎诊断：嗓音数量 + 测试发声结果 */
+  const [voiceCount, setVoiceCount] = useState(() => (speechSupported() ? window.speechSynthesis.getVoices().length : 0));
+  const [speechTest, setSpeechTest] = useState<string | null>(null);
+  useEffect(() => {
+    if (!speechSupported()) return;
+    const update = () => setVoiceCount(window.speechSynthesis.getVoices().length);
+    window.speechSynthesis.addEventListener?.('voiceschanged', update);
+    update();
+    return () => window.speechSynthesis.removeEventListener?.('voiceschanged', update);
+  }, []);
   /** 每日新词上限草稿：受控滑块值（拖动即时反馈，停止后自动保存） */
   const [limitDraft, setLimitDraft] = useState<number>(user?.dailyNewLimit ?? 10);
   const limitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -151,6 +161,23 @@ export default function SettingsPage() {
             />
           </button>
         </div>
+        {/* 语音引擎诊断：发声异常时先看这里 */}
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+          <p className="text-xs text-slate-500">
+            语音引擎：{speechSupported() ? `可用 · 嗓音 ${voiceCount} 个` : '不可用（浏览器不支持）'}
+          </p>
+          <button
+            onClick={async () => {
+              speak('ability');
+              const ok = await speechProbe(400);
+              setSpeechTest(ok ? '✅ 引擎正在朗读（若仍无声：查系统音量/静音键/蓝牙）' : '🔇 引擎未响应：请刷新页面，或换一个浏览器试试');
+            }}
+            className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+          >
+            🔊 测试发声
+          </button>
+        </div>
+        {speechTest && <p className="mt-2 text-center text-xs leading-relaxed text-amber-600">{speechTest}</p>}
       </section>
 
       {/* 🧪 本地测试工具（DEV_MODE=1 时后端才放行） */}

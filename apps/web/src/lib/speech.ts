@@ -51,6 +51,21 @@ export function autoSpeak(text: string, rate = 0.85): void {
   if (speechAutoEnabled()) speak(text, rate);
 }
 
+/** 发声诊断：afterMs 毫秒后返回引擎是否真的在朗读（speaking/pending/paused 任一） */
+export function speechProbe(afterMs = 400): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (!speechSupported()) return resolve(false);
+    window.setTimeout(() => {
+      try {
+        const s = window.speechSynthesis;
+        resolve(s.speaking || s.pending || s.paused);
+      } catch {
+        resolve(false);
+      }
+    }, afterMs);
+  });
+}
+
 /** 共享的「下一拍再读」调度：避免 cancel/speak 同拍竞态，也防连续点击叠音 */
 let speakTimer: ReturnType<typeof setTimeout> | null = null;
 function scheduleSpeak(start: () => void): void {
