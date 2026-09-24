@@ -33,6 +33,8 @@ export function primeSpeech(): void {
     const u = new SpeechSynthesisUtterance(' ');
     u.volume = 0;
     u.lang = 'en-US';
+    const voice = pickEnglishVoice(); // 预热也用本地嗓音，避免挂在网络嗓音上
+    if (voice) u.voice = voice;
     window.speechSynthesis.speak(u);
   } catch {
     /* 静默失败 */
@@ -137,15 +139,30 @@ export function speakSequence(items: string[], rate = 0.85): void {
   }
 }
 
-/** 优先挑自然的英文嗓音（Chrome/Edge 的 Google/Natural 系列），否则退回任意英文 */
-function pickEnglishVoice(): SpeechSynthesisVoice | null {
+/**
+ * 挑选英文嗓音：本地引擎优先（离线可用、国内无障碍）。
+ *
+ * Windows 的 Chrome/Edge 会同时列出本地嗓音（Microsoft Zira/David 等，localService=true）
+ * 和 Google 网络嗓音（localService=false，需要连 Google 服务器——国内不可达，
+ * 选中会静默无声）。因此本地嗓音优先，网络嗓音只作最后兜底。
+ */
+export function pickEnglishVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices();
-  if (voices.length === 0) return null; // 嗓音列表异步加载，缺失时交给 lang 兜底
-  const en = voices.filter((v) => v.lang.toLowerCase().startsWith('en'));
+  if (voices.length === 0) return null;
+  const norm = (lang: string) => lang.toLowerCase().replace('_', '-');
+  const en = voices.filter((v) => norm(v.lang).startsWith('en'));
+  if (en.length === 0) return null;
+  const local = en.filter((v) => v.localService);
+  const online = en.filter((v) => !v.localService);
+  const nice = /natural|aria|jenny|samantha|zira|david|hazel|george|susannah/i;
   return (
-    en.find((v) => /natural|google us english|aria|jenny|samantha|zira/i.test(v.name)) ??
-    en.find((v) => v.lang === 'en-US') ??
-    en[0] ??
+    local.find((v) => nice.test(v.name)) ??
+    local.find((v) => norm(v.lang) === 'en-us') ??
+    local[0] ??
+    // 本地没有英文嗓音才退到在线嗓音（Edge 的 Natural 在线嗓音国内可达）
+    online.find((v) => nice.test(v.name)) ??
+    online.find((v) => norm(v.lang) === 'en-us') ??
+    online[0] ??
     null
   );
 }

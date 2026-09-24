@@ -78,6 +78,9 @@ export const api = {
   updateMe: (patch: Partial<Pick<PublicUser, 'nickname' | 'dailyNewLimit' | 'scheduleMode' | 'goalBookId'>>) =>
     request<{ user: PublicUser }>('/api/me', { method: 'PATCH', body: JSON.stringify(patch) }),
 
+  /** 一键清空所有学习记录，重新开始（保留账号与偏好设置；需重做摸底） */
+  resetMe: () => request<{ ok: boolean; user: PublicUser }>('/api/me/reset', { method: 'POST' }),
+
   today: (mode?: 'normal' | 'redo') => request<TodayResponse>(`/api/today${mode === 'redo' ? '?mode=redo' : ''}`),
 
   submitReviews: (items: Array<{ wordId: string; rating: string; latencyMs?: number }>, maxCombo?: number) =>

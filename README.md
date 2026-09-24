@@ -73,6 +73,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/e2e-bughunt.mjs [origin]` | 深度 Bug Hunt（本地，需 DEV_MODE）：快闪复习→毕业循环/降级恢复/词苗同日计龄/FSRS 切换/边界输入/重复词提交计数（26 步） |
 | `node scripts/check-new-word-dist.mjs [origin]` | 新词首字母分布检查：连续注册 5 用户拉取今日新词，验证首字母分散（修复 a 打头扎堆） |
 | `node scripts/verify-tz-fix.mjs [origin]` | 北京时区日期键验证：today.date=北京日期 + 上限 2 当天出 2 个新词（修复清晨无新词） |
+| `node scripts/e2e-reset.mjs [origin]` | 一键清空记录 E2E（16 步）：重置后统计/图鉴/积分清零、词书解锁回收、今日队列重建、需重做摸底 |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设

@@ -3,7 +3,7 @@ import { and, eq, lte, ne, isNull, sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
-import { dailyPlans, dailyStats, userCards, userInventory, userPets, userPoints, userRankMeta, userWordStates, users, wordbooks } from '@app/db';
+import { achievements, dailyPlans, dailyStats, reviewLogs, userBattles, userBossDaily, userCards, userInventory, userPets, userPoints, userRankMeta, userSeasonRank, userWordStates, users, wordbooks } from '@app/db';
 import { PET_STAGES, cardDrawAllowance, computeStreak, migrateCardState } from '@app/core';
 import type { CardState } from '@app/core';
 import { publicUser } from './auth';
@@ -219,4 +219,39 @@ meRoutes.patch('/', async (c) => {
     .returning();
 
   return c.json({ user: publicUser(updated) });
+});
+
+/* POST /api/me/reset —— 一键清空所有学习记录，重新开始背单词。
+ * 删除：学习状态/复习日志/每日计划/每日统计/成就/词苗/词卡图鉴/词力积分/道具/段位/对战记录；
+ * 重置：摸底状态（需重做摸底）与水平；保留：账号、密码、偏好设置（词书/每日新词数/调度模式）。 */
+meRoutes.post('/reset', async (c) => {
+  const userId = c.get('userId');
+  const db = getDb(c.env);
+
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) return c.json({ error: 'not_found', message: '用户不存在' }, 404);
+
+  await db.batch([
+    db.delete(userWordStates).where(eq(userWordStates.userId, userId)),
+    db.delete(reviewLogs).where(eq(reviewLogs.userId, userId)),
+    db.delete(dailyPlans).where(eq(dailyPlans.userId, userId)),
+    db.delete(dailyStats).where(eq(dailyStats.userId, userId)),
+    db.delete(achievements).where(eq(achievements.userId, userId)),
+    db.delete(userPets).where(eq(userPets.userId, userId)),
+    db.delete(userCards).where(eq(userCards.userId, userId)),
+    db.delete(userPoints).where(eq(userPoints.userId, userId)),
+    db.delete(userInventory).where(eq(userInventory.userId, userId)),
+    db.delete(userSeasonRank).where(eq(userSeasonRank.userId, userId)),
+    db.delete(userRankMeta).where(eq(userRankMeta.userId, userId)),
+    db.delete(userBattles).where(eq(userBattles.userId, userId)),
+    db.delete(userBossDaily).where(eq(userBossDaily.userId, userId)),
+  ] as unknown as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]]);
+
+  const [updated] = await db
+    .update(users)
+    .set({ level: 50, placementDone: false })
+    .where(eq(users.id, userId))
+    .returning();
+
+  return c.json({ ok: true, user: publicUser(updated) });
 });

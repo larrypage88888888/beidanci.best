@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ScheduleMode } from '@app/core';
 import { api } from '../lib/api';
-import { setSpeechAutoEnabled, speechAutoEnabled, speechProbe, speechSupported, speak } from '../lib/speech';
+import { pickEnglishVoice, setSpeechAutoEnabled, speechAutoEnabled, speechProbe, speechSupported, speak } from '../lib/speech';
 import { useAuthStore } from '../stores/auth';
 import { useSessionStore } from '../stores/session';
 
@@ -20,16 +20,40 @@ export default function SettingsPage() {
   const [devMsg, setDevMsg] = useState<string | null>(null);
   const [devOk, setDevOk] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(() => speechAutoEnabled());
-  /** 语音引擎诊断：嗓音数量 + 测试发声结果 */
+  /** 语音引擎诊断：嗓音数量 + 当前选用嗓音 + 测试发声结果 */
   const [voiceCount, setVoiceCount] = useState(() => (speechSupported() ? window.speechSynthesis.getVoices().length : 0));
+  const [voiceName, setVoiceName] = useState('');
   const [speechTest, setSpeechTest] = useState<string | null>(null);
   useEffect(() => {
     if (!speechSupported()) return;
-    const update = () => setVoiceCount(window.speechSynthesis.getVoices().length);
+    const update = () => {
+      setVoiceCount(window.speechSynthesis.getVoices().length);
+      const v = pickEnglishVoice();
+      setVoiceName(v ? `${v.name}${v.localService ? '（本地）' : '（在线）'}` : '默认');
+    };
     window.speechSynthesis.addEventListener?.('voiceschanged', update);
     update();
     return () => window.speechSynthesis.removeEventListener?.('voiceschanged', update);
   }, []);
+  /** 清空记录：两步确认（第一次点展开确认，第二次点执行），防误触 */
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [resetBusy, setResetBusy] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  async function doReset() {
+    setResetBusy(true);
+    setResetError(null);
+    try {
+      const res = await api.resetMe();
+      setUser(res.user); // placementDone=false → 路由守卫自动引导去摸底
+      useSessionStore.getState().hardReset();
+      setConfirmReset(false);
+      navigate('/placement', { replace: true });
+    } catch (e) {
+      setResetError(e instanceof Error ? e.message : '清空失败，请稍后重试');
+    } finally {
+      setResetBusy(false);
+    }
+  }
   /** 每日新词上限草稿：受控滑块值（拖动即时反馈，停止后自动保存） */
   const [limitDraft, setLimitDraft] = useState<number>(user?.dailyNewLimit ?? 10);
   const limitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -165,6 +189,7 @@ export default function SettingsPage() {
         <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
           <p className="text-xs text-slate-500">
             语音引擎：{speechSupported() ? `可用 · 嗓音 ${voiceCount} 个` : '不可用（浏览器不支持）'}
+            {voiceName && <span className="ml-1 text-slate-400">· 当前 {voiceName}</span>}
           </p>
           <button
             onClick={async () => {
@@ -221,6 +246,41 @@ export default function SettingsPage() {
         >
           退出登录
         </button>
+      </section>
+
+      {/* ☠️ 危险区：一键清空所有记录 */}
+      <section className="rounded-2xl border border-red-100 bg-white p-5 shadow">
+        <p className="text-sm font-bold text-red-600">☠️ 清空所有记录，重新开始</p>
+        <p className="mt-1 text-xs leading-relaxed text-slate-400">
+          删除全部学习进度、复习记录、统计与连击、词苗、词卡图鉴、词力积分、道具、段位与对战记录，
+          然后重新摸底开始背单词。账号密码与偏好设置（词书/每日新词数/调度模式）保留。<b className="text-red-500">此操作不可恢复！</b>
+        </p>
+        {resetError && <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-500">{resetError}</p>}
+        {!confirmReset ? (
+          <button
+            onClick={() => setConfirmReset(true)}
+            className="mt-3 w-full rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
+          >
+            🗑️ 一键清空，重新开始
+          </button>
+        ) : (
+          <div className="mt-3 space-y-2">
+            <button
+              onClick={() => void doReset()}
+              disabled={resetBusy}
+              className="w-full rounded-xl bg-red-600 py-2.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
+            >
+              {resetBusy ? '正在清空…' : '⚠️ 确认清空（不可恢复）'}
+            </button>
+            <button
+              onClick={() => setConfirmReset(false)}
+              disabled={resetBusy}
+              className="w-full rounded-xl border border-slate-200 py-2 text-xs font-medium text-slate-500 transition hover:bg-slate-50"
+            >
+              取消，我想想
+            </button>
+          </div>
+        )}
       </section>
 
       <p className="pb-6 pt-2 text-center text-[11px] text-slate-300">词流 WordFlow v0.1.0 · M0 MVP</p>

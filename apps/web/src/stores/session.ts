@@ -77,6 +77,8 @@ interface SessionState {
   acceptRelearn: () => void;
   /** 独立预习：只翻今天剩余新词的预习卡（与做题流程分开），翻完可一键进入做题 */
   startPreview: () => void;
+  /** 清空本地会话（服务端记录被一键清空后调用），回到初始待加载状态 */
+  hardReset: () => void;
   /** 预习词卡「下一个」；最后一张后进入做题 */
   advancePreview: () => void;
   /** 跳过剩余预习词卡，直接进入做题 */
@@ -293,6 +295,34 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
       relearnQueue: s.relearnQueue.slice(1),
       relearnAttempts: { ...s.relearnAttempts, [wordId]: (s.relearnAttempts[wordId] ?? 0) + 1 },
       phase: 'learning',
+    });
+  },
+
+  /** 清空本地会话：一键清空记录后回到初始状态，下次进入今日学习会重新拉取 */
+  hardReset: () => {
+    questionStartAt = 0;
+    set({
+      phase: 'idle',
+      date: '',
+      items: new Map(),
+      questions: [],
+      idx: 0,
+      mirror: {},
+      buffer: [],
+      summary: { total: 0, remembered: 0, fuzzy: 0, forgot: 0, graduated: 0 },
+      streak: 0,
+      newQuotaUsed: 0,
+      error: null,
+      wrongIds: [],
+      relearnQueue: [],
+      inRelearnRound: false,
+      relearnAttempts: {},
+      previewIds: [],
+      previewTotal: 0,
+      combo: newCombo(),
+      pet: null,
+      cardDraw: null,
+      reviveCards: 0,
     });
   },
 
