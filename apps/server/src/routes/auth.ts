@@ -144,6 +144,12 @@ authRoutes.post('/forgot', async (c) => {
   }
   await c.env.CACHE.put(rlKey, '1', { expirationTtl: 60 });
 
+  // 邮件能力统一前置检查：未配置时对所有请求一致返回 503（避免已注册/未注册响应差异泄露注册状态）
+  const emailReady = c.env.DEV_MODE === '1' || !!c.env.RESEND_API_KEY;
+  if (!emailReady) {
+    return c.json({ error: 'email_not_configured', message: '邮件服务未配置，请联系管理员' }, 503);
+  }
+
   const [user] = await getDb(c.env).select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
   const okBody = {
     ok: true,
