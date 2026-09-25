@@ -81,6 +81,20 @@ export const api = {
   /** 一键清空所有学习记录，重新开始（保留账号与偏好设置；需重做摸底） */
   resetMe: () => request<{ ok: boolean; user: PublicUser }>('/api/me/reset', { method: 'POST' }),
 
+  /** 忘记密码：发重置邮件（统一成功响应，不泄露注册状态；本地 DEV_MODE 返回 devLink 供测试） */
+  forgotPassword: (email: string) =>
+    request<{ ok: boolean; message: string; devLink?: string }>('/api/auth/forgot', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  /** 邮件链接重置密码（令牌一次性，30 分钟有效） */
+  resetPassword: (token: string, password: string) =>
+    request<{ ok: boolean; message: string }>('/api/auth/reset', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    }),
+
   today: (mode?: 'normal' | 'redo') => request<TodayResponse>(`/api/today${mode === 'redo' ? '?mode=redo' : ''}`),
 
   submitReviews: (items: Array<{ wordId: string; rating: string; latencyMs?: number }>, maxCombo?: number) =>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/auth';
 
 /** 登录 / 注册（M0：邮箱 + 密码；后续可加微信/Apple OAuth） */
@@ -94,6 +94,13 @@ export default function AuthPage() {
           >
             {busy ? '请稍候…' : tab === 'login' ? '登录' : '注册并开始'}
           </button>
+          {tab === 'login' && (
+            <p className="text-center">
+              <Link to="/forgot" className="text-xs text-slate-400 transition hover:text-blue-600">
+                忘记密码？
+              </Link>
+            </p>
+          )}
         </form>
       </div>
     </div>

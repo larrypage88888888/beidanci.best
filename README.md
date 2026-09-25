@@ -74,6 +74,7 @@ pnpm dev:web             # http://localhost:5173
 | `node scripts/check-new-word-dist.mjs [origin]` | 新词首字母分布检查：连续注册 5 用户拉取今日新词，验证首字母分散（修复 a 打头扎堆） |
 | `node scripts/verify-tz-fix.mjs [origin]` | 北京时区日期键验证：today.date=北京日期 + 上限 2 当天出 2 个新词（修复清晨无新词） |
 | `node scripts/e2e-reset.mjs [origin]` | 一键清空记录 E2E（16 步）：重置后统计/图鉴/积分清零、词书解锁回收、今日队列重建、需重做摸底 |
+| `node scripts/e2e-password-reset.mjs [origin]` | 密码重置 E2E（13 步，本地 DEV_MODE）：forgot 拿 devLink→重置→旧密码失效/新密码登录/令牌一次性/防刷/不泄露注册状态 |
 | `node scripts/e2e-prod.mjs <prod-url>` | 生产冒烟：静态资产+全流程+DEV 工具已禁用（11 步） |
 
 > 本地脚本默认走 Vite 代理 `http://localhost:5173`；生产验证需代理环境时先设
